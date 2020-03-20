@@ -1,0 +1,29 @@
+{
+    "name": "@runejs/byte-buffer",
+    "version": "1.0.0",
+    "description": "A customized implementation of a NodeJS Buffer.",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "start": "ts-node src/test.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/rune-js/byte-buffer.git"
+    },
+    "author": "TheBlackParade",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/rune-js/cache-parser/issues"
+    },
+    "homepage": "https://github.com/rune-js/cache-parser#readme",
+    "dependencies": {
+        "@runejs/logger": "^1.0.0",
+        "typescript": "^3.7.2"
+    },
+    "devDependencies": {
+        "@types/node": "^12.12.6",
+        "ts-node": "^8.5.4"
+    }
+}
