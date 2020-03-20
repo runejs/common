@@ -15,9 +15,9 @@
     "author": "TheBlackParade",
     "license": "GPL-3.0",
     "bugs": {
-        "url": "https://github.com/rune-js/cache-parser/issues"
+        "url": "https://github.com/rune-js/byte-buffer/issues"
     },
-    "homepage": "https://github.com/rune-js/cache-parser#readme",
+    "homepage": "https://github.com/rune-js/byte-buffer#readme",
     "dependencies": {
         "@runejs/logger": "^1.0.0",
         "typescript": "^3.7.2"
