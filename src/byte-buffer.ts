@@ -2,6 +2,15 @@ type DataType = 'BYTE' | 'SHORT' | 'SMART' | 'INT24' | 'INT' | 'LONG';
 type Endianness = 'LITTLE_ENDIAN' | 'BIG_ENDIAN' | 'MIDDLE_ENDIAN_1' | 'MIDDLE_ENDIAN_2';
 type Signedness = 'SIGNED' | 'UNSIGNED';
 
+const MAX_SIGNED_LENGTHS = {
+    'BYTE': 127,
+    'SHORT': 32767,
+    'SMART': -1,
+    'INT24': 8388607,
+    'INT': 2147483647,
+    'LONG': BigInt('9223372036854775807')
+};
+
 const SIZES = {
     'BYTE': 1,
     'SHORT': 2,
@@ -68,14 +77,15 @@ export class ByteBuffer extends Uint8Array {
         return Buffer.from(bytes).toString();
     }
 
-    public put(value: number | bigint, type: DataType = 'BYTE', signed: Signedness = 'SIGNED', endian: Endianness = 'BIG_ENDIAN'): void {
+    public put(value: number | bigint, type: DataType = 'BYTE', endian: Endianness = 'BIG_ENDIAN'): void {
         const writerIndex = this._writerIndex;
 
         if(type === 'SMART') {
             this.putSmart(value as number);
         } else {
+            let maxSignedLength = MAX_SIGNED_LENGTHS[type];
             let size = SIZES[type];
-            let signedChar = signed === 'SIGNED' ? '' : 'U';
+            let signedChar = value > maxSignedLength ? 'U' : '';
             let lenChars = BYTE_LEN[type];
             let suffix = type === 'BYTE' ? '' : ENDIAN_SUFFIX[endian];
             let smol = type === 'LONG' ? 'Big' : '';
@@ -97,30 +107,25 @@ export class ByteBuffer extends Uint8Array {
         this.put(0); // end of line
     }
 
-    public putBits(bitCount: number, value: number): ByteBuffer {
-        const byteCount: number = Math.ceil(bitCount / 8) + 1;
-        const buffer = this.ensureCapacity((this.bitIndex + 7) / 8 + byteCount);
+    public putBits(bitCount: number, value: number): void {
+        let byteIndex: number = this.bitIndex >> 3;
+        let bitOffset: number = 8 - (this.bitIndex & 7);
 
-        let byteIndex: number = buffer.bitIndex >> 3;
-        let bitOffset: number = 8 - (buffer.bitIndex & 7);
-
-        buffer.bitIndex += bitCount;
+        this.bitIndex += bitCount;
 
         for(; bitCount > bitOffset; bitOffset = 8) {
-            buffer.buffer[byteIndex] &= ~BIT_MASKS[bitOffset];
-            buffer.buffer[byteIndex++] |= (value >> (bitCount - bitOffset)) & BIT_MASKS[bitOffset];
+            this[byteIndex] &= ~BIT_MASKS[bitOffset];
+            this[byteIndex++] |= (value >> (bitCount - bitOffset)) & BIT_MASKS[bitOffset];
             bitCount -= bitOffset;
         }
 
         if(bitCount == bitOffset) {
-            buffer.buffer[byteIndex] &= ~BIT_MASKS[bitOffset];
-            buffer.buffer[byteIndex] |= value & BIT_MASKS[bitOffset];
+            this[byteIndex] &= ~BIT_MASKS[bitOffset];
+            this[byteIndex] |= value & BIT_MASKS[bitOffset];
         } else {
-            buffer.buffer[byteIndex] &= ~(BIT_MASKS[bitCount] << (bitOffset - bitCount));
-            buffer.buffer[byteIndex] |= (value & BIT_MASKS[bitCount]) << (bitOffset - bitCount);
+            this[byteIndex] &= ~(BIT_MASKS[bitCount] << (bitOffset - bitCount));
+            this[byteIndex] |= (value & BIT_MASKS[bitCount]) << (bitOffset - bitCount);
         }
-
-        return buffer;
     }
 
     public openBitBuffer(): void {
@@ -151,24 +156,11 @@ export class ByteBuffer extends Uint8Array {
         return newBuffer;
     }
 
-    public ensureCapacity(space: number): ByteBuffer {
-        if(this.writable < this.writerIndex + space) {
-            const newBuffer = new ByteBuffer(this.writerIndex + space);
-            this.copy(newBuffer, 0, 0);
-            newBuffer.writerIndex = this.writerIndex;
-            newBuffer.readerIndex = this.readerIndex;
-            newBuffer.bitIndex = this.bitIndex;
-            return newBuffer;
-        } else {
-            return this;
-        }
-    }
-
     public getSlice(position: number, length: number): ByteBuffer {
         return new ByteBuffer(this.slice(position, position + length));
     }
 
-    public writeBytes(from: ByteBuffer | Buffer): void {
+    public putBytes(from: ByteBuffer | Buffer): void {
         from.copy(this, this.writerIndex, 0);
         this.writerIndex = (this.writerIndex + from.length);
     }
