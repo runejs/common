@@ -7,6 +7,7 @@ export const setLoggerDateFormat = (format: string) => runeJsLoggerDateFormat = 
 
 const log = (consoleType: string, ...args: any[]): void => {
     const date = moment().format(runeJsLoggerDateFormat);
+
     args.forEach(msg => {
         if(consoleType === 'debug') {
             msg = cyan(msg);
@@ -15,14 +16,21 @@ const log = (consoleType: string, ...args: any[]): void => {
         } else if(consoleType === 'error') {
             msg = red(msg);
         }
-        const str = gray(`[${date}]: `) + msg;
-        console[consoleType](str);
+
+        if(typeof msg === 'string') {
+            const str = gray(`[${date}] `) + msg;
+            console[consoleType](str);
+        } else {
+            console[consoleType](gray(`[${date}]`), msg);
+        }
     });
 };
 
 export const logger = {
-    info:  (...message: any[]) => log('info', ...message),
-    debug: (...message: any[]) => log('info', ...message),
-    warn:  (...message: any[]) => log('warn', ...message),
-    error: (...message: any[]) => log('error', ...message)
+    info:  (...messages: any[]) => log('info', ...messages),
+    debug: (...messages: any[]) => log('info', ...messages),
+    warn:  (...messages: any[]) => log('warn', ...messages),
+    error: (...messages: any[]) => log('error', ...messages),
+    trace: (...messages: any[]) => log('trace', ...messages),
+    fatal: (...messages: any[]) => log('fatal', ...messages)
 };

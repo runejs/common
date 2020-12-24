@@ -160,9 +160,14 @@ export class ByteBuffer extends Uint8Array {
         return new ByteBuffer(this.slice(position, position + length));
     }
 
-    public putBytes(from: ByteBuffer | Buffer): void {
-        from.copy(this, this.writerIndex, 0);
+    public putBytes(from: ByteBuffer | Buffer, fromStart?: number, fromEnd?: number): void {
+        from.copy(this, this.writerIndex, fromStart || 0, fromEnd || from.length);
         this.writerIndex = (this.writerIndex + from.length);
+    }
+
+    public getBytes(to: ByteBuffer | Buffer, length?: number): void {
+        this.copy(to, 0, this.readerIndex, this.readerIndex + length);
+        this.readerIndex += length;
     }
 
     public readInt8: (offset: number) => number;
