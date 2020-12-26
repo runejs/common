@@ -1,7 +1,7 @@
 {
     "name": "@runejs/core",
-    "version": "1.0.0",
-    "description": "Core functionality for RuneJS applications.",
+    "version": "1.0.1",
+    "description": "Core logging and networking functionality for RuneJS applications.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {

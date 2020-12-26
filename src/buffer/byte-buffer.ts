@@ -77,7 +77,7 @@ export class ByteBuffer extends Uint8Array {
         return Buffer.from(bytes).toString();
     }
 
-    public put(value: number | bigint, type: DataType = 'BYTE', endian: Endianness = 'BIG_ENDIAN'): void {
+    public put(value: number | bigint, type: DataType = 'BYTE', endian: Endianness = 'BIG_ENDIAN'): ByteBuffer {
         const writerIndex = this._writerIndex;
 
         if(type === 'SMART') {
@@ -94,9 +94,11 @@ export class ByteBuffer extends Uint8Array {
             const methodName = `write${signedChar}${smol}Int${lenChars}${suffix}`;
             this[methodName](value, writerIndex);
         }
+
+        return this;
     }
 
-    public putString(value: string): void {
+    public putString(value: string): ByteBuffer {
         const encoder = new TextEncoder();
         const bytes = encoder.encode(value);
 
@@ -105,9 +107,10 @@ export class ByteBuffer extends Uint8Array {
         }
 
         this.put(0); // end of line
+        return this;
     }
 
-    public putBits(bitCount: number, value: number): void {
+    public putBits(bitCount: number, value: number): ByteBuffer {
         let byteIndex: number = this.bitIndex >> 3;
         let bitOffset: number = 8 - (this.bitIndex & 7);
 
@@ -126,10 +129,13 @@ export class ByteBuffer extends Uint8Array {
             this[byteIndex] &= ~(BIT_MASKS[bitCount] << (bitOffset - bitCount));
             this[byteIndex] |= (value & BIT_MASKS[bitCount]) << (bitOffset - bitCount);
         }
+
+        return this;
     }
 
-    public openBitBuffer(): void {
+    public openBitBuffer(): ByteBuffer {
         this.bitIndex = this.writerIndex * 8;
+        return this;
     }
 
     public closeBitBuffer(): void {
@@ -160,9 +166,10 @@ export class ByteBuffer extends Uint8Array {
         return new ByteBuffer(this.slice(position, position + length));
     }
 
-    public putBytes(from: ByteBuffer | Buffer, fromStart?: number, fromEnd?: number): void {
+    public putBytes(from: ByteBuffer | Buffer, fromStart?: number, fromEnd?: number): ByteBuffer {
         from.copy(this, this.writerIndex, fromStart || 0, fromEnd || from.length);
         this.writerIndex = (this.writerIndex + from.length);
+        return this;
     }
 
     public getBytes(to: ByteBuffer | Buffer, length?: number): void {
