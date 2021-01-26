@@ -52,7 +52,7 @@ export class ByteBuffer extends Uint8Array {
         const readerIndex = this._readerIndex;
 
         if(type === 'SMART') {
-            return this.getSmart(readerIndex);
+            return this.getSmart(readerIndex, signed);
         } else {
             let size = SIZES[type];
             let signedChar = signed === 'SIGNED' ? '' : 'U';
@@ -189,13 +189,13 @@ export class ByteBuffer extends Uint8Array {
         }
     }
 
-    private getSmart(offset: number): number {
+    private getSmart(offset: number, signed: Signedness = 'SIGNED'): number {
         const peek = this[offset];
 
         if(peek < 128) {
-            return this.get('BYTE', 'UNSIGNED');
+            return this.get('BYTE', 'UNSIGNED') - (signed === 'SIGNED' ? 0 : 64);
         } else {
-            return this.get('SHORT', 'UNSIGNED') - 32768;
+            return this.get('SHORT', 'UNSIGNED') - (signed === 'SIGNED' ? 32768 : 49152);
         }
     }
 
