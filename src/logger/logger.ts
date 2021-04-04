@@ -1,36 +1,90 @@
-import moment from 'moment';
-import { gray, red, yellow, cyan } from 'colors';
+import pino, { Logger, LoggerOptions, TimeFn } from 'pino';
 
-let runeJsLoggerDateFormat = 'YYYY-MM-DDTHH:mm:ss';
 
-export const setLoggerDateFormat = (format: string) => runeJsLoggerDateFormat = format;
+export const LOGGER_DEFAULT_TIME_FN: true | TimeFn = pino.stdTimeFunctions.isoTime;
 
-const log = (consoleType: string, ...args: any[]): void => {
-    const date = moment().format(runeJsLoggerDateFormat);
+/**
+ * The main RuneJS wrapper class for the Pino logger.
+ */
+export class RuneLogger {
 
-    args.forEach(msg => {
-        if(consoleType === 'debug') {
-            msg = cyan(msg);
-        } else if(consoleType === 'warn') {
-            msg = yellow(msg);
-        } else if(consoleType === 'error') {
-            msg = red(msg);
-        }
+    /**
+     * The logger's active date/time format function for log messages.
+     * IE timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`
+     */
+    public loggerTimeFn: true | TimeFn = LOGGER_DEFAULT_TIME_FN;
 
-        if(typeof msg === 'string') {
-            const str = gray(`[${date}] `) + msg;
-            console[consoleType](str);
-        } else {
-            console[consoleType](gray(`[${date}]`), msg);
-        }
+    /**
+     * The main pino logger instance for the wrapper object.
+     */
+    public pinoLogger: Logger = pino({
+        timestamp: this.loggerTimeFn,
+        prettyPrint: true
+    });
+
+    public info(...messages: any[]): void {
+        this.log('info', ...messages);
+    }
+    public debug(...messages: any[]): void {
+        this.log('debug', ...messages);
+    }
+    public warn(...messages: any[]): void {
+        this.log('warn', ...messages);
+    }
+    public error(...messages: any[]): void {
+        this.log('error', ...messages);
+    }
+    public trace(...messages: any[]): void {
+        this.log('trace', ...messages);
+    }
+    public fatal(...messages: any[]): void {
+        this.log('fatal', ...messages);
+    }
+
+    private log(consoleType: string, ...args: any[]): void {
+        (this.pinoLogger[consoleType] as any)(...args);
+    }
+
+}
+
+
+/**
+ * The main logger singleton instance.
+ */
+export const logger: RuneLogger = new RuneLogger();
+
+
+/**
+ * Sets the logger options to the given options object.
+ * @param options
+ */
+export const setLoggerOptions = (options: LoggerOptions): void => {
+    if(!options.timestamp) {
+        options.timestamp = LOGGER_DEFAULT_TIME_FN;
+    }
+
+    logger.loggerTimeFn = options.timestamp;
+    logger.pinoLogger = pino(options);
+};
+
+
+/**
+ * Sets the logger prettyPrint value.
+ * @param prettyPrint The value to set prettyPrint to.
+ */
+export const setLoggerPrettyPrint = (prettyPrint: boolean): void => {
+    logger.pinoLogger = pino({
+        timestamp: logger.loggerTimeFn,
+        prettyPrint
     });
 };
 
-export const logger = {
-    info:  (...messages: any[]) => log('info', ...messages),
-    debug: (...messages: any[]) => log('info', ...messages),
-    warn:  (...messages: any[]) => log('warn', ...messages),
-    error: (...messages: any[]) => log('error', ...messages),
-    trace: (...messages: any[]) => log('trace', ...messages),
-    fatal: (...messages: any[]) => log('fatal', ...messages)
+
+/**
+ * Sets the logger's date/time function to the given value.
+ * @param format The function that will return the partial JSON value of the current time for Pino to ingest.
+ * IE timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`
+ */
+export const setLoggerTimeFn = (format: TimeFn): void => {
+    logger.loggerTimeFn = format;
 };

@@ -7,7 +7,7 @@ export abstract class SocketConnectionHandler {
     protected constructor() {
     }
 
-    abstract async dataReceived(data: ByteBuffer): Promise<void>;
+    abstract dataReceived(data: ByteBuffer): void | Promise<void>;
     abstract connectionDestroyed(): void;
 
 }

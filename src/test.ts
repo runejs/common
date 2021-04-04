@@ -1,5 +1,6 @@
-import { openServer, SocketConnectionHandler, logger, ByteBuffer, setLoggerDateFormat } from './index';
+import { openServer, SocketConnectionHandler, logger, ByteBuffer } from './index';
 import { Socket } from 'net';
+
 
 class TestConnectionHandler extends SocketConnectionHandler {
 
@@ -18,7 +19,6 @@ class TestConnectionHandler extends SocketConnectionHandler {
 }
 
 function launchTestServer() {
-    setLoggerDateFormat('HH:mm:ss');
     logger.info('Starting server...', { hello: 'world' });
     openServer('Test Server', '0.0.0.0', 43586, socket => new TestConnectionHandler(socket));
 }
