@@ -5,17 +5,19 @@
 
 # @runejs/core
 
-Core logging and networking functionality for RuneJS applications.
+Core logging, networking, and buffer functionality for RuneJS applications.
 
 ### Logger
-* Full `console` logging wrappers:
+* `RuneLogger` singleton Pino `logger` wrapper:
     * `logger.info(...messages)`
     * `logger.debug(...messages)`
     * `logger.warn(...messages)`
     * `logger.error(...messages)`
     * `logger.fatal(...messages)`
     * `logger.trace(...messages)`
-* Ability to set logging date/time format via `setLoggerDateFormat(format)`
+* Ability to set the Pino logging date/time formatting function via `setLoggerTimeFn(Pino.TimeFn)`
+* Ability to set the Pino logging pretty print config value via `setLoggerPrettyPrint(boolean)`
+* Setting of _all_ Pino logging options via `setLoggerOptions(Pino.LoggerOptions)`
 
 ### Byte Buffer
 * Node `Uint8Array` wrapper with additional utility functions.
