@@ -1,5 +1,7 @@
-import { openServer, SocketConnectionHandler, logger, ByteBuffer } from './index';
 import { Socket } from 'net';
+import { openServer, SocketConnectionHandler } from './net';
+import { ByteBuffer } from './buffer';
+import { logger } from './logger';
 
 
 class TestConnectionHandler extends SocketConnectionHandler {
@@ -9,7 +11,7 @@ class TestConnectionHandler extends SocketConnectionHandler {
     }
 
     async dataReceived(data: ByteBuffer): Promise<void> {
-        logger.info(`Data received:`, data);
+        logger.info(`Data received:`, data.getString());
     }
 
     connectionDestroyed(): void {
@@ -20,7 +22,16 @@ class TestConnectionHandler extends SocketConnectionHandler {
 
 function launchTestServer() {
     logger.info('Starting server...', { hello: 'world' });
-    openServer('Test Server', '0.0.0.0', 43586, socket => new TestConnectionHandler(socket));
+    openServer('Test Server', '0.0.0.0', 43594, socket => {
+        const handler = new TestConnectionHandler(socket);
+        const testMessage = 'hello world';
+        const buffer = new ByteBuffer(20);
+        buffer.putString(testMessage);
+
+        setTimeout(() => socket.write(buffer.flipWriter()), 2000);
+
+        return handler;
+    });
 }
 
 launchTestServer();

@@ -1,6 +1,7 @@
-import { logger } from '..';
+import { logger } from '../logger';
 import { JSON_SCHEMA, safeLoad } from 'js-yaml';
 import { readFileSync } from 'fs';
+
 
 interface ServerConfigOptions {
     useDefault?: boolean;

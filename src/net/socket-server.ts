@@ -1,6 +1,7 @@
 import { createServer, Socket } from 'net';
-import { ByteBuffer } from '..';
-import { logger } from '..';
+import { ByteBuffer } from '../buffer';
+import { logger } from '../logger';
+
 
 export abstract class SocketConnectionHandler {
 

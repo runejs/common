@@ -1,8 +1,20 @@
-type DataType = 'BYTE' | 'SHORT' | 'SMART' | 'INT24' | 'INT' | 'LONG';
-type Endianness = 'LITTLE_ENDIAN' | 'BIG_ENDIAN' | 'MIDDLE_ENDIAN_1' | 'MIDDLE_ENDIAN_2';
-type Signedness = 'SIGNED' | 'UNSIGNED';
 
-const MAX_SIGNED_LENGTHS = {
+export type DataType =
+    'BYTE' | 'SHORT' | 'SMART' | 'INT24' | 'INT' | 'LONG' |
+    'byte' | 'short' | 'smart' | 'int24' | 'int' | 'long';
+
+export type Endianness =
+    'LITTLE_ENDIAN' | 'BIG_ENDIAN' | 'MIDDLE_ENDIAN_1' | 'MIDDLE_ENDIAN_2' |
+    'little_endian' | 'big_endian' | 'middle_endian_1' | 'middle_endian_2' |
+    'le' | 'LE' | 'be' | 'BE' | 'me1' | 'ME1' | 'me2' | 'ME2';
+
+export type Signedness =
+    'SIGNED' | 'UNSIGNED' |
+    'signed' | 'unsigned' |
+    's' | 'u';
+
+
+export const MAX_SIGNED_LENGTHS = {
     'BYTE': 127,
     'SHORT': 32767,
     'SMART': -1,
@@ -11,7 +23,7 @@ const MAX_SIGNED_LENGTHS = {
     'LONG': BigInt('9223372036854775807')
 };
 
-const SIZES = {
+export const BYTE_LENGTH = {
     'BYTE': 1,
     'SHORT': 2,
     'SMART': -1,
@@ -20,7 +32,7 @@ const SIZES = {
     'LONG': 8
 };
 
-const BYTE_LEN = {
+export const BIT_LENGTH = {
     'BYTE': 8,
     'SHORT': 16,
     'SMART': -1,
@@ -29,7 +41,7 @@ const BYTE_LEN = {
     'LONG': 64
 };
 
-const ENDIAN_SUFFIX = {
+export const ENDIAN_SUFFIX = {
     'LITTLE_ENDIAN': 'LE',
     'BIG_ENDIAN': 'BE',
     'MIDDLE_ENDIAN_1': 'ME1',
@@ -48,20 +60,32 @@ export class ByteBuffer extends Uint8Array {
     private _readerIndex: number = 0;
     private bitIndex: number;
 
-    public get(type: DataType = 'BYTE', signed: Signedness = 'SIGNED', endian: Endianness = 'BIG_ENDIAN'): number {
+    public static getSignage(signed: Signedness): string {
+        return signed.length === 1 ? signed.toUpperCase() : signed.toUpperCase().charAt(0);
+    }
+
+    public static getEndianness(endian: Endianness): string {
+        return endian.length < 4 ? endian.toUpperCase() : ENDIAN_SUFFIX[endian.toUpperCase()];
+    }
+
+    public get(type: DataType = 'byte', signed: Signedness = 'signed', endian: Endianness = 'be'): number {
         const readerIndex = this._readerIndex;
 
-        if(type === 'SMART') {
+        const typeString = type.toUpperCase();
+        const signedString = ByteBuffer.getSignage(signed);
+        const endianString = ByteBuffer.getEndianness(endian);
+
+        if(typeString === 'SMART') {
             return this.getSmart(readerIndex, signed);
         } else {
-            let size = SIZES[type];
-            let signedChar = signed === 'SIGNED' ? '' : 'U';
-            let lenChars = BYTE_LEN[type];
-            let suffix = type === 'BYTE' ? '' : ENDIAN_SUFFIX[endian];
-            let smol = type === 'LONG' ? 'Big' : '';
+            let size = BYTE_LENGTH[typeString];
+            let signedChar = signedString === 'S' ? '' : 'U';
+            let bitLength = BIT_LENGTH[typeString];
+            let suffix = typeString === 'BYTE' ? '' : endianString;
+            let smol = typeString === 'LONG' ? 'Big' : '';
 
             this._readerIndex += size;
-            const methodName = `read${signedChar}${smol}Int${lenChars}${suffix}`;
+            const methodName = `read${signedChar}${smol}Int${bitLength}${suffix}`;
             return this[methodName](readerIndex) as number;
         }
     }
@@ -70,25 +94,28 @@ export class ByteBuffer extends Uint8Array {
         const bytes: number[] = [];
         let b: number;
 
-        while((b = this.get('BYTE')) !== terminatingChar) {
+        while((b = this.get('byte')) !== terminatingChar) {
             bytes.push(b);
         }
 
         return Buffer.from(bytes).toString();
     }
 
-    public put(value: number | bigint, type: DataType = 'BYTE', endian: Endianness = 'BIG_ENDIAN'): ByteBuffer {
+    public put(value: number | bigint, type: DataType = 'byte', endian: Endianness = 'be'): ByteBuffer {
         const writerIndex = this._writerIndex;
 
-        if(type === 'SMART') {
+        const typeString = type.toUpperCase();
+        const endianString = ByteBuffer.getEndianness(endian);
+
+        if(typeString === 'SMART') {
             this.putSmart(value as number);
         } else {
-            let maxSignedLength = MAX_SIGNED_LENGTHS[type];
-            let size = SIZES[type];
+            let maxSignedLength = MAX_SIGNED_LENGTHS[typeString];
+            let size = BYTE_LENGTH[typeString];
             let signedChar = value > maxSignedLength ? 'U' : '';
-            let lenChars = BYTE_LEN[type];
-            let suffix = type === 'BYTE' ? '' : ENDIAN_SUFFIX[endian];
-            let smol = type === 'LONG' ? 'Big' : '';
+            let lenChars = BIT_LENGTH[typeString];
+            let suffix = typeString === 'BYTE' ? '' : endianString;
+            let smol = typeString === 'LONG' ? 'Big' : '';
 
             this._writerIndex += size;
             const methodName = `write${signedChar}${smol}Int${lenChars}${suffix}`;
@@ -142,12 +169,8 @@ export class ByteBuffer extends Uint8Array {
         this.writerIndex = Math.floor((this.bitIndex + 7) / 8);
     }
 
-    public at(index: number, signed: Signedness = 'SIGNED'): number {
-        if(signed === 'SIGNED') {
-            return this.readInt8(index);
-        } else {
-            return this.readUInt8(index);
-        }
+    public at(index: number, signed: Signedness = 'signed'): number {
+        return ByteBuffer.getSignage(signed) === 'S' ? this.readInt8(index) : this.readUInt8(index);
     }
 
     public flipWriter(): ByteBuffer {
@@ -183,19 +206,21 @@ export class ByteBuffer extends Uint8Array {
 
     private putSmart(value: number): void {
         if(value >= 128) {
-            this.put(value, 'SHORT');
+            this.put(value, 'short');
         } else {
-            this.put(value, 'BYTE');
+            this.put(value, 'byte');
         }
     }
 
     private getSmart(offset: number, signed: Signedness = 'SIGNED'): number {
         const peek = this[offset];
 
+        const signedString = ByteBuffer.getSignage(signed);
+
         if(peek < 128) {
-            return this.get('BYTE', 'UNSIGNED') - (signed === 'SIGNED' ? 0 : 64);
+            return this.get('byte', 'u') - (signedString === 'S' ? 0 : 64);
         } else {
-            return this.get('SHORT', 'UNSIGNED') - (signed === 'SIGNED' ? 32768 : 49152);
+            return this.get('short', 'u') - (signedString === 'S' ? 32768 : 49152);
         }
     }
 
