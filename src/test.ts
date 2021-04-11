@@ -1,7 +1,7 @@
 import { Socket } from 'net';
 import { openServer, SocketConnectionHandler } from './net';
 import { ByteBuffer } from './buffer';
-import { logger } from './logger';
+import { logger } from './index';
 
 
 class TestConnectionHandler extends SocketConnectionHandler {
