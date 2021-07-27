@@ -70,7 +70,7 @@ export abstract class SocketServer<T = undefined> {
     }
 
     abstract initialHandshake(data: ByteBuffer): boolean;
-    abstract decodeMessage(data: ByteBuffer): void;
+    abstract decodeMessage(data: ByteBuffer): void | Promise<void>;
     abstract connectionDestroyed(): void;
 
     public closeConnection(): void {
@@ -96,6 +96,10 @@ export abstract class SocketServer<T = undefined> {
 
     public get connectionStatus(): ConnectionStatus | T {
         return this._connectionStatus;
+    }
+
+    public get connectionAlive(): boolean {
+        return this.socket?.writable && !this.socket.destroyed;
     }
 
 }
