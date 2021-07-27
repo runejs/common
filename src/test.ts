@@ -1,37 +1,46 @@
-import { Socket } from 'net';
-import { openServer, SocketConnectionHandler } from './net';
+import { SocketServer } from './net';
 import { ByteBuffer } from './buffer';
 import { logger } from './index';
+import { Socket } from 'net';
 
 
-class TestConnectionHandler extends SocketConnectionHandler {
+class TestConnectionHandler extends SocketServer {
 
-    public constructor(private readonly socket: Socket) {
-        super();
-    }
-
-    async dataReceived(data: ByteBuffer): Promise<void> {
+    public decodeMessage(data: ByteBuffer): void {
         logger.info(`Data received:`, data.getString());
     }
 
-    connectionDestroyed(): void {
+    public initialHandshake(data: ByteBuffer): boolean {
+        logger.info(`Initial handshake:`, data.getString());
+        return true;
+    }
+
+    public connectionDestroyed(): void {
         logger.info(`Connection destroyed.`);
     }
 
 }
 
 function launchTestServer() {
-    logger.info('Starting server...', { hello: 'world' });
-    openServer('Test Server', '0.0.0.0', 43594, socket => {
-        const handler = new TestConnectionHandler(socket);
-        const testMessage = 'hello world';
-        const buffer = new ByteBuffer(20);
-        buffer.putString(testMessage);
+    logger.info('Starting server...');
 
-        setTimeout(() => socket.write(buffer.flipWriter()), 2000);
+    SocketServer.launch('Test Server', '0.0.0.0', 43594, socket =>
+        new TestConnectionHandler(socket));
 
-        return handler;
-    });
+    const speakySocket = new Socket();
+    speakySocket.connect(43594);
+
+    setTimeout(() => {
+        const buffer = new ByteBuffer(200);
+        buffer.put('hi', 'string');
+        speakySocket.write(buffer.flipWriter());
+    }, 3000);
+
+    setTimeout(() => {
+        const buffer = new ByteBuffer(200);
+        buffer.put('how are you?', 'string');
+        speakySocket.write(buffer.flipWriter());
+    }, 6000);
 }
 
 launchTestServer();

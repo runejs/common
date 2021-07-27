@@ -1,6 +1,10 @@
-import { logger } from '../logger';
+import path from 'path';
+import * as fs from 'fs';
 import { JSON_SCHEMA, safeLoad } from 'js-yaml';
-import { readFileSync } from 'fs';
+import { logger } from '../logger';
+
+
+type SupportedFileTypes = 'json' | 'yaml';
 
 
 interface ServerConfigOptions {
@@ -9,7 +13,8 @@ interface ServerConfigOptions {
     configFileName?: string;
 }
 
-export function parseServerConfig<T>(options?: ServerConfigOptions): T {
+
+function sanitizeConfigOptions(options?: ServerConfigOptions): ServerConfigOptions {
     if(!options) {
         options = {
             useDefault: false,
@@ -25,28 +30,43 @@ export function parseServerConfig<T>(options?: ServerConfigOptions): T {
         }
     }
 
-    try {
-        const config = safeLoad(readFileSync(
-            `${options.configDir}/${options.configFileName}${options.useDefault ? '.example' : ''}.yaml`, 'utf8'),
-            { schema: JSON_SCHEMA }) as T;
+    return options;
+}
 
-        if(!config) {
-            if(!options.useDefault) {
-                logger.warn('Server config not provided, using default...');
-                return parseServerConfig({ useDefault: true });
-            } else {
-                throw new Error('Syntax Error');
-            }
-        }
 
-        return config;
-    } catch(error) {
+export function parseServerConfig<T>(options?: ServerConfigOptions): T {
+    options = sanitizeConfigOptions(options);
+
+    let filePath = path.join(options.configDir, options.configFileName);
+    if(options.useDefault) {
+        filePath += '.example';
+    }
+
+    let fileType: SupportedFileTypes | undefined;
+
+    if(fs.existsSync(`${filePath}.json`)) {
+        fileType = 'json';
+    } else if(fs.existsSync(`${filePath}.yaml`)) {
+        fileType = 'yaml';
+    } else {
         if(!options.useDefault) {
-            logger.warn('Server config not provided, using default...');
+            logger.warn(`Server config not provided, using default...`);
             return parseServerConfig({ useDefault: true });
         } else {
-            logger.error('Error parsing server config: ' + error);
-            return null;
+            throw new Error(`Unable to load server configuration: Default (.example) server configuration file not found.`);
         }
+    }
+
+    filePath += `.${fileType}`;
+
+    const configFileContent = fs.readFileSync(filePath, 'utf-8');
+    if(!configFileContent) {
+        throw new Error(`Syntax error encountered while loading server configuration file.`);
+    }
+
+    if(fileType === 'json') {
+        return JSON.parse(configFileContent) as T;
+    } else if(fileType === 'yaml') {
+        return safeLoad(configFileContent, { schema: JSON_SCHEMA }) as T;
     }
 }

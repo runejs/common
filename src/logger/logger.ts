@@ -42,7 +42,7 @@ export class RuneLogger {
     }
 
     private log(consoleType: string, ...args: any[]): void {
-        (this.pinoLogger[consoleType] as any)(...args);
+        args.forEach(arg => (this.pinoLogger[consoleType] as any)(arg));
     }
 
 }
