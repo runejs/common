@@ -69,10 +69,6 @@ export abstract class SocketServer<T = undefined> {
         }
     }
 
-    abstract initialHandshake(data: ByteBuffer): boolean;
-    abstract decodeMessage(data: ByteBuffer): void | Promise<void>;
-    abstract connectionDestroyed(): void;
-
     public closeConnection(): void {
         this._connectionStatus = ConnectionStatus.CLOSED;
         if(this.socket?.writable && !this.socket.destroyed) {
@@ -93,6 +89,10 @@ export abstract class SocketServer<T = undefined> {
             logger.error(closeConnectionError);
         }
     }
+
+    abstract initialHandshake(data: ByteBuffer): boolean;
+    abstract decodeMessage(data: ByteBuffer): void | Promise<void>;
+    abstract connectionDestroyed(): void;
 
     public get connectionStatus(): ConnectionStatus | T {
         return this._connectionStatus;

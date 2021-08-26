@@ -58,6 +58,10 @@ for(let i = 0; i < 32; i++) {
 
 export class ByteBuffer extends Uint8Array {
 
+    public readInt8: (offset: number) => number;
+    public readUInt8: (offset: number) => number;
+    public copy: (targetBuffer: Uint8Array, targetStart?: number, sourceStart?: number, sourceEnd?: number) => number;
+
     private _writerIndex: number = 0;
     private _readerIndex: number = 0;
     private _bitIndex: number;
@@ -216,10 +220,6 @@ export class ByteBuffer extends Uint8Array {
         this.copy(newBuffer, 0, 0, this.readerIndex);
         return newBuffer;
     }
-
-    public readInt8: (offset: number) => number;
-    public readUInt8: (offset: number) => number;
-    public copy: (targetBuffer: Uint8Array, targetStart?: number, sourceStart?: number, sourceEnd?: number) => number;
 
     public getString(terminatingChar: number = 0): string {
         const bytes: number[] = [];
