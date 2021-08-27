@@ -18,7 +18,6 @@ export abstract class SocketServer<T = undefined> {
         socket.setTimeout(30000);
 
         socket.on('data', data => {
-            logger.info(`Data received...`);
             try {
                 this.dataReceived(data);
             } catch(e) {
@@ -52,7 +51,6 @@ export abstract class SocketServer<T = undefined> {
 
     public dataReceived(data: Buffer): void {
         if(!data) {
-            logger.warn(`No data received.`);
             return;
         }
 
