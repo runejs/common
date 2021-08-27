@@ -18,12 +18,12 @@ function sanitizeConfigOptions(options?: ServerConfigOptions): ServerConfigOptio
     if(!options) {
         options = {
             useDefault: false,
-            configDir: 'data/config',
+            configDir: 'config',
             configFileName: 'server-config'
         };
     } else {
         if(!options.configDir) {
-            options.configDir = 'data/config';
+            options.configDir = 'config';
         }
         if(!options.configFileName) {
             options.configFileName = 'server-config';

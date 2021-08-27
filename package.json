@@ -1,6 +1,6 @@
 {
     "name": "@runejs/core",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "description": "Core logging, networking, and buffer functionality for RuneJS applications.",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -12,7 +12,8 @@
         "copy-documents": "cp package.json lib && cp README.md lib && cp .npmignore lib && cp LICENSE lib",
         "copy-documents:windows": "copy package.json lib && copy README.md lib && copy .npmignore lib && copy LICENSE lib",
         "package": "rimraf lib && npm run build && npm run copy-documents && cd lib && npm publish --dry-run",
-        "package:windows": "rimraf lib && npm run build && npm run copy-documents:windows && cd lib && npm publish --dry-run"
+        "package:windows": "rimraf lib && npm run build && npm run copy-documents:windows && cd lib && npm publish --dry-run",
+        "publish": "cd lib && npm publish"
     },
     "repository": {
         "type": "git",
