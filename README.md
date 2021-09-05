@@ -5,10 +5,10 @@
 
 # @runejs/core
 
-Core logging, networking, and buffer functionality for RuneJS applications.
+Core logging, networking, compression, encryption, and additional buffer functionality for RuneJS applications.
 
-### Logger
-* `RuneLogger` singleton Pino `logger` wrapper:
+### @runejs/core
+* `logger` is exported as a singleton Pino logging wrapper, offering the following functions:
     * `logger.info(...messages)`
     * `logger.debug(...messages)`
     * `logger.warn(...messages)`
@@ -19,20 +19,26 @@ Core logging, networking, and buffer functionality for RuneJS applications.
 * Ability to set the Pino logging pretty print config value via `setLoggerPrettyPrint(boolean)`
 * Setting of _all_ Pino logging options via `setLoggerOptions(Pino.LoggerOptions)`
 
-### Byte Buffer
-* Node `Uint8Array` wrapper with additional utility functions.
-* Unified configurable `get` and `put` methods to easily move bytes within the buffer.
-* Int24, Smart, Long and String type support.
-* Big endian, little endian, and mixed endian support.
-* Bit access through `openBitBuffer()`, `putBits()`, and `closeBitBuffer()`
+### @runejs/core/buffer
+* `ByteBuffer` is the main export.
+  * Node `Uint8Array` wrapper with additional utility functions.
+  * Unified configurable `get` and `put` methods to easily move bytes within the buffer.
+  * Int24, Smart, Long and String type support.
+  * Big endian, little endian, and mixed endian support.
+  * Bit access through `openBitBuffer()`, `putBits()`, and `closeBitBuffer()`
 
-### Networking Components
+### @runejs/core/net
+* `SocketServer`
+  * Handles connections made to a RuneJS socket server.
+* `SocketServer.launch(serverName, hostName, port, connectionHandlerFactory)`
+  * Spins up a new Node Socket server with the specified host and port.
+* `ServerConfigOptions`
+  * Options for a configured Socket server, imported using the `parseServerConfig()` function.
 
-#### openServer(name, host, port, connectionHandlerFactory)
-Spins up a new Node Socket server with the specified host and port.
+### @runejs/core/compression
+* Exported class `Gzip` handles Gzip compression and decompression.
+* Exported class `Bzip2` handles Bzip2 compression and decompression.
 
-#### SocketConnectionHandler
-Handles connections made to a Socket server opened via `openServer()`
-
-#### ServerConfigOptions
-Options for a configured Socket server, imported using the `parseServerConfig()` function.
+### @runejs/core/encryption
+Provides XTEA encryption and decryption functionality, as well as a key file loader.
+* Exported as class `Xtea`
