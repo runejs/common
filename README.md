@@ -3,11 +3,11 @@
 
 ![RuneJS](https://i.imgur.com/pmkdSfc.png)
 
-# @runejs/core
+# @runejs/common
 
-Core logging, networking, compression, encryption, and additional buffer functionality for RuneJS applications.
+Common logging, networking, compression, and other additional functionality for RuneJS applications.
 
-### @runejs/core
+### @runejs/common
 * `logger` is exported as a singleton Pino logging wrapper, offering the following functions:
     * `logger.info(...messages)`
     * `logger.debug(...messages)`
@@ -19,7 +19,7 @@ Core logging, networking, compression, encryption, and additional buffer functio
 * Ability to set the Pino logging pretty print config value via `setLoggerPrettyPrint(boolean)`
 * Setting of _all_ Pino logging options via `setLoggerOptions(Pino.LoggerOptions)`
 
-### @runejs/core/buffer
+### @runejs/common/buffer
 * `ByteBuffer` is the main export.
   * Node `Uint8Array` wrapper with additional utility functions.
   * Unified configurable `get` and `put` methods to easily move bytes within the buffer.
@@ -27,7 +27,7 @@ Core logging, networking, compression, encryption, and additional buffer functio
   * Big endian, little endian, and mixed endian support.
   * Bit access through `openBitBuffer()`, `putBits()`, and `closeBitBuffer()`
 
-### @runejs/core/net
+### @runejs/common/net
 * `SocketServer`
   * Handles connections made to a RuneJS socket server.
 * `SocketServer.launch(serverName, hostName, port, connectionHandlerFactory)`
@@ -35,10 +35,18 @@ Core logging, networking, compression, encryption, and additional buffer functio
 * `ServerConfigOptions`
   * Options for a configured Socket server, imported using the `parseServerConfig()` function.
 
-### @runejs/core/compression
+### @runejs/common/compression
 * Exported class `Gzip` handles Gzip compression and decompression.
 * Exported class `Bzip2` handles Bzip2 compression and decompression.
 
-### @runejs/core/encryption
+### @runejs/common/encryption
 Provides XTEA encryption and decryption functionality, as well as a key file loader.
 * Exported as class `Xtea`
+
+### @runejs/common/color
+Handles various color conversions needed by the game and tooling.
+* `RGB(A)`
+* `HSL` (Hue, Saturation, Lightness)
+* `HSV` (Hue, Saturation, Value/Brightness)
+* `HCL` (Hue, Chroma, Luminance)
+* `LAB` (Lightness, A, B)
