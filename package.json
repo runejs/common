@@ -1,6 +1,6 @@
 {
     "name": "@runejs/common",
-    "version": "1.0.0-beta.0",
+    "version": "1.0.0-rc.1",
     "description": "Common logging, networking, compression, and other functionality for RuneJS applications.",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
