@@ -90,9 +90,11 @@ export class ByteBuffer extends Uint8Array {
         return Buffer.from(this);
     }
 
-    public get(type: 'string' | 'STRING'): string;
-    public get(type: DataType, signed?: Signedness, endian?: Endianness): number;
-    public get(type: DataType = 'byte', signed: Signedness = 'signed', endian: Endianness = 'be'): number | string {
+    public get(): number;
+    public get(type: Extract<DataType, 'string' | 'STRING'>): string;
+    public get(type: Extract<DataType, 'long' | 'LONG'>, signed?: Signedness, endian?: Endianness): bigint;
+    public get(type: Exclude<DataType, 'string' | 'STRING' | 'long' | 'LONG'>, signed?: Signedness, endian?: Endianness): number;
+    public get(type: DataType = 'byte', signed: Signedness = 'signed', endian: Endianness = 'be'): number | bigint | string {
         type = ByteBuffer.getType(type);
         signed = ByteBuffer.getSignage(signed);
         endian = ByteBuffer.getEndianness(endian);
@@ -111,10 +113,14 @@ export class ByteBuffer extends Uint8Array {
             const smol = type === 'long' ? 'Big' : '';
 
             this._readerIndex += size;
-            const methodName = `read${signedChar}${smol}Int${bitLength}${suffix}`;
+            const methodName = `read${smol}${signedChar}Int${bitLength}${suffix}`;
 
             try {
-                return this[methodName](readerIndex) as number;
+                if(type === 'long') {
+                    return this[methodName](readerIndex) as bigint;
+                } else {
+                    return this[methodName](readerIndex) as number;
+                }
             } catch(error) {
                 logger.error(`Error reading ${methodName}:`, error);
                 return null;
@@ -122,7 +128,9 @@ export class ByteBuffer extends Uint8Array {
         }
     }
 
-    public put(value: string, type: 'string' | 'STRING'): ByteBuffer;
+    public put(value: number): ByteBuffer;
+    public put(value: string, type: Extract<DataType, 'string' | 'STRING'>): ByteBuffer;
+    public put(value: bigint, type: Extract<DataType, 'long' | 'LONG'>): ByteBuffer;
     public put(value: number | bigint, type?: DataType, endian?: Endianness): ByteBuffer
     public put(value: number | bigint | string, type: DataType = 'byte', endian: Endianness = 'be'): ByteBuffer {
         const writerIndex = this._writerIndex;
@@ -132,10 +140,8 @@ export class ByteBuffer extends Uint8Array {
 
         if(type === 'smart') {
             return this.putSmart(value as number);
-        } else if(type === 'string') {
-            if(typeof value === 'string') {
-                return this.putString(value);
-            }
+        } else if(type === 'string' || typeof value === 'string') {
+            return this.putString(typeof value !== 'string' ? String(value) : value);
         } else {
             const maxSignedLength = MAX_SIGNED_LENGTHS[type];
             const size = BYTE_LENGTH[type];
@@ -253,7 +259,7 @@ export class ByteBuffer extends Uint8Array {
         return this;
     }
 
-    public getSmart(offset: number, signed: Signedness = 'SIGNED'): number {
+    public getSmart(offset: number, signed: Signedness = 'signed'): number {
         const peek = this[offset];
 
         const signedString = ByteBuffer.getSignage(signed);
@@ -263,6 +269,13 @@ export class ByteBuffer extends Uint8Array {
         } else {
             return this.get('short', 'u') - (signedString === 'S' ? 32768 : 49152);
         }
+    }
+
+    public clone(): ByteBuffer {
+        const dataCopy = new ByteBuffer(this.length);
+        this.copy(dataCopy, 0, 0);
+        dataCopy.readerIndex = this.readerIndex;
+        return dataCopy;
     }
 
     public readUInt24BE(offset: number): number {
