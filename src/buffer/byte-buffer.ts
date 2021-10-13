@@ -94,6 +94,7 @@ export class ByteBuffer extends Uint8Array {
     public get(type: Extract<DataType, 'string' | 'STRING'>): string;
     public get(type: Extract<DataType, 'long' | 'LONG'>, signed?: Signedness, endian?: Endianness): bigint;
     public get(type: Exclude<DataType, 'string' | 'STRING' | 'long' | 'LONG'>, signed?: Signedness, endian?: Endianness): number;
+    public get(type?: DataType, signed?: Signedness, endian?: Endianness): number | bigint | string;
     public get(type: DataType = 'byte', signed: Signedness = 'signed', endian: Endianness = 'be'): number | bigint | string {
         type = ByteBuffer.getType(type);
         signed = ByteBuffer.getSignage(signed);

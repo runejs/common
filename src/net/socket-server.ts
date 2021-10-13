@@ -102,15 +102,22 @@ export abstract class SocketServer<T = undefined> {
         this.connectionDestroyed();
     }
 
-    public error(error: any): void {
-        logger.error('Socket destroyed due to error:');
-        logger.error(error);
+    public error(error: Error): void;
+    public error(error: { message?: string }): void;
+    public error(error: string): void;
+    public error(error: any | Error | { message?: string } | string): void;
+    public error(error: any | Error | { message?: string } | string): void {
+        if(error && typeof error === 'string') {
+            error = { message: error };
+        }
+
+        logger.error('Socket destroyed due to error' + error?.message ? `: ${error.message}` : '.');
 
         try {
             this.closeConnection();
         } catch(closeConnectionError) {
-            logger.error(`Error closing server connection:`);
-            logger.error(closeConnectionError);
+            logger.error('Error closing server connection' +
+            closeConnectionError?.message ? `: ${closeConnectionError.message}` : '.');
         }
     }
 
