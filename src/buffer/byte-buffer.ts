@@ -60,7 +60,7 @@ export class ByteBuffer extends Uint8Array {
 
     public readInt8: (offset: number) => number;
     public readUInt8: (offset: number) => number;
-    public copy: (targetBuffer: Uint8Array, targetStart?: number, sourceStart?: number, sourceEnd?: number) => number;
+    public copy: (targetBuffer: Uint8Array | ByteBuffer, targetStart?: number, sourceStart?: number, sourceEnd?: number) => number;
 
     private _writerIndex: number = 0;
     private _readerIndex: number = 0;
@@ -165,8 +165,21 @@ export class ByteBuffer extends Uint8Array {
         return null;
     }
 
-    public at(index: number, signed: Signedness = 'signed'): number {
-        return ByteBuffer.getSignage(signed) === 'S' ? this.readInt8(index) : this.readUInt8(index);
+    public at(index: number): number;
+    public at(index: number, type: Extract<DataType, 'string' | 'STRING'>): string;
+    public at(index: number, type: Extract<DataType, 'long' | 'LONG'>, signed?: Signedness, endian?: Endianness): bigint;
+    public at(index: number, type: Exclude<DataType, 'string' | 'STRING' | 'long' | 'LONG'>, signed?: Signedness, endian?: Endianness): number;
+    public at(index: number, type?: DataType, signed?: Signedness, endian?: Endianness): number | bigint | string;
+    public at(index: number, type: DataType = 'byte', signed: Signedness = 'signed', endian: Endianness = 'be'): number | bigint | string {
+        const readerIndex = this.readerIndex;
+        this.readerIndex = index;
+
+        const value = this.get(type, signed, endian);
+
+        // Reset to the original reader index
+        this.readerIndex = readerIndex;
+
+        return value;
     }
 
     public getSlice(position: number, length: number): ByteBuffer {
