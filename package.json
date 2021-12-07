@@ -1,6 +1,6 @@
 {
     "name": "@runejs/common",
-    "version": "2.0.0-rc.9",
+    "version": "2.0.0-rc.13",
     "description": "Common logging, networking, compression, and other functionality for RuneJS applications.",
     "main": "./index.js",
     "types": "./index.d.ts",
@@ -8,7 +8,8 @@
         ".": "./index.js",
         "./buffer": "./buffer/index.js",
         "./color": "./color/index.js",
-        "./compression": "./compression/index.js",
+        "./compress": "./compress/index.js",
+        "./encrypt": "./encrypt/index.js",
         "./fs": "./fs/index.js",
         "./logger": "./logger/index.js",
         "./net": "./net/index.js",

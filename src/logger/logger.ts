@@ -1,4 +1,4 @@
-import pino, { Logger, LoggerOptions, TimeFn } from 'pino';
+import pino, { Logger, LoggerOptions, TimeFn, destination } from 'pino';
 
 
 export const LOGGER_DEFAULT_TIME_FN: true | TimeFn = pino.stdTimeFunctions.isoTime;
@@ -88,3 +88,10 @@ export const setLoggerPrettyPrint = (prettyPrint: boolean): void => {
 export const setLoggerTimeFn = (format: TimeFn): void => {
     logger.loggerTimeFn = format;
 };
+
+
+/**
+ * Sets the logger's output log file destination path.
+ * @param dest The path for the log file to be written to.
+ */
+export const setLoggerDest = (dest: string) => destination(dest);
