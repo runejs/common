@@ -1,7 +1,7 @@
 {
     "name": "@runejs/common",
-    "version": "2.0.0-rc.13",
-    "description": "Common logging, networking, compression, and other functionality for RuneJS applications.",
+    "version": "2.0.0-rc.16",
+    "description": "Common logging, networking, compression, and other miscellaneous functionality for RuneJS.",
     "main": "./index.js",
     "types": "./index.d.ts",
     "exports": {
@@ -9,6 +9,7 @@
         "./buffer": "./buffer/index.js",
         "./color": "./color/index.js",
         "./compress": "./compress/index.js",
+        "./crc32": "./crc32/index.js",
         "./encrypt": "./encrypt/index.js",
         "./fs": "./fs/index.js",
         "./logger": "./logger/index.js",
@@ -28,41 +29,42 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/runejs/core.git"
+        "url": "git+ssh://git@github.com/runejs/common.git"
     },
     "keywords": [
         "runejs",
         "runescape",
         "typescript"
     ],
-    "author": "Tynarus",
+    "author": "Kikorono",
     "license": "GPL-3.0",
     "bugs": {
-        "url": "https://github.com/runejs/core/issues"
+        "url": "https://github.com/runejs/common/issues"
     },
-    "homepage": "https://github.com/runejs/core#readme",
+    "homepage": "https://github.com/runejs/common#readme",
     "peerDependencies": {
         "tslib": ">=2.3.0",
-        "typescript": ">=4.4.0"
+        "typescript": ">=4.5.0"
     },
     "dependencies": {
         "compressjs": "^1.0.3",
         "js-yaml": "^3.14.1",
-        "pino": "^6.13.0",
+        "pino": "^6.14.0",
         "pino-pretty": "^4.8.0",
+        "sonic-boom": "^2.6.0",
         "tslib": "^2.3.1"
     },
     "devDependencies": {
         "@runejs/eslint-config": "^1.0.0",
-        "@types/node": "^14.17.6",
-        "@types/pino": "^6.3.11",
-        "@typescript-eslint/eslint-plugin": "^4.29.3",
-        "@typescript-eslint/parser": "^4.29.3",
+        "@types/node": "^16.11.26",
+        "@types/pino": "^6.3.12",
+        "@typescript-eslint/eslint-plugin": "^4.33.0",
+        "@typescript-eslint/parser": "^4.33.0",
         "copyfiles": "^2.4.1",
         "eslint": "^7.32.0",
         "rimraf": "^3.0.2",
         "ts-node-dev": "^1.1.8",
-        "typescript": "^4.4.4"
+        "typescript": "^4.5.5"
     },
     "eslintConfig": {
         "extends": [
