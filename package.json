@@ -1,6 +1,6 @@
 {
     "name": "@runejs/common",
-    "version": "2.0.0-rc.16",
+    "version": "2.0.1",
     "description": "Common logging, networking, compression, and other miscellaneous functionality for RuneJS.",
     "main": "./index.js",
     "types": "./index.d.ts",
@@ -25,7 +25,8 @@
         "package": "rimraf lib && npm i && npm run build && npm run copy-documents && cd lib && npm publish --dry-run",
         "publish:next": "npm run package && cd lib && npm publish -tag next",
         "publish:beta": "npm run package && cd lib && npm publish -tag beta",
-        "publish:rc": "npm run package && cd lib && npm publish -tag rc"
+        "publish:rc": "npm run package && cd lib && npm publish -tag rc",
+        "publish:release": "npm run package && cd lib && npm publish"
     },
     "repository": {
         "type": "git",
