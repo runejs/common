@@ -29,7 +29,7 @@ export const pad = (value: number, paddingAmount: number, options?: PadOptions):
         return new Array(paddingAmount).fill(char).join('');
     }
 
-    let stringified = `${value}`;
+    const stringified = `${value}`;
     const parts = stringified.split('.');
     if(!parts?.length) {
         return 'NaN';

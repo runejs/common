@@ -26,17 +26,17 @@ export abstract class Color<T> {
         this.alpha = alpha;
     }
 
+    public static values<T>(colorValues: Partial<T>): Partial<T> {
+        return { ...colorValues } as unknown as Partial<T>;
+    }
+
     /**
      * Converts the color into a debug string.
      */
     abstract toString(): string;
 
-    public static values<T>(colorValues: Partial<T>): Partial<T> {
-        return { ...colorValues } as unknown as Partial<T>;
-    }
-
     public values(colorValues: Partial<T>): T {
-        if(colorValues.hasOwnProperty('alpha')) {
+        if(colorValues['alpha']) {
             return { ...colorValues, format: this.format } as unknown as T;
         }
         return { ...colorValues, format: this.format, alpha: this.alpha } as unknown as T;

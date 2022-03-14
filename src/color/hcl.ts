@@ -86,11 +86,11 @@ export class HCL extends HCLValues {
             c = 0;
             l = 0;
         } else {
-            let alpha = (min / max) / 100;
-            let q = Math.exp(alpha * 3);
-            let rg = r - g;
-            let gb = g - b;
-            let br = b - r;
+            const alpha = (min / max) / 100;
+            const q = Math.exp(alpha * 3);
+            const rg = r - g;
+            const gb = g - b;
+            const br = b - r;
             l = ((q * max) + ((1 - q) * min)) / 2;
             c = q * (Math.abs(rg) + Math.abs(gb) + Math.abs(br)) / 3;
         }
