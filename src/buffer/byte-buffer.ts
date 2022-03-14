@@ -2,8 +2,8 @@ import { Buffer } from 'buffer';
 import { logger } from '../logger';
 
 export type DataType =
-    'BYTE' | 'SHORT' | 'SMART' | 'INT24' | 'INT' | 'LONG' | 'STRING' |
-    'byte' | 'short' | 'smart' | 'int24' | 'int' | 'long' | 'string';
+    'BYTE' | 'SHORT' | 'SMART_SHORT' | 'SMART_INT' | 'INT24' | 'INT' | 'LONG' | 'STRING' |
+    'byte' | 'short' | 'smart_short' | 'smart_int' | 'int24' | 'int' | 'long' | 'string';
 
 export type Endianness =
     'LITTLE_ENDIAN' | 'BIG_ENDIAN' | 'MIDDLE_ENDIAN_1' | 'MIDDLE_ENDIAN_2' |
@@ -19,7 +19,8 @@ export type Signedness =
 export const MAX_SIGNED_LENGTHS = {
     'byte': 127,
     'short': 32767,
-    'smart': -1,
+    'smart_short': -1,
+    'smart_int': -1,
     'int24': 8388607,
     'int': 2147483647,
     'long': BigInt('9223372036854775807')
@@ -102,8 +103,10 @@ export class ByteBuffer extends Uint8Array {
 
         const readerIndex = this._readerIndex;
 
-        if(type === 'smart') {
-            return this.getSmart(readerIndex, signed);
+        if(type === 'smart_short') {
+            return this.getSmartShort(readerIndex, signed);
+        } else if(type === 'smart_int') {
+            return this.getSmartInt(readerIndex, signed);
         } else if(type === 'string') {
             return this.getString();
         } else {
@@ -139,8 +142,10 @@ export class ByteBuffer extends Uint8Array {
         type = ByteBuffer.getType(type);
         endian = ByteBuffer.getEndianness(endian);
 
-        if(type === 'smart') {
-            return this.putSmart(value as number);
+        if(type === 'smart_short') {
+            return this.putSmartShort(value as number);
+        } else if(type === 'smart_int') {
+            return this.putSmartInt(value as number);
         } else if(type === 'string' || typeof value === 'string') {
             return this.putString(typeof value !== 'string' ? String(value) : value);
         } else {
@@ -161,8 +166,6 @@ export class ByteBuffer extends Uint8Array {
                 return null;
             }
         }
-
-        return null;
     }
 
     public at(index: number): number;
@@ -264,7 +267,7 @@ export class ByteBuffer extends Uint8Array {
         return this;
     }
 
-    public putSmart(value: number): ByteBuffer {
+    public putSmartShort(value: number): ByteBuffer {
         if(value >= 128) {
             this.put(value, 'short');
         } else {
@@ -273,7 +276,7 @@ export class ByteBuffer extends Uint8Array {
         return this;
     }
 
-    public getSmart(offset: number, signed: Signedness = 'signed'): number {
+    public getSmartShort(offset: number, signed: Signedness = 'signed'): number {
         const peek = this[offset];
 
         const signedString = ByteBuffer.getSignage(signed);
@@ -282,6 +285,27 @@ export class ByteBuffer extends Uint8Array {
             return this.get('byte', 'u') - (signedString === 'S' ? 0 : 64);
         } else {
             return this.get('short', 'u') - (signedString === 'S' ? 32768 : 49152);
+        }
+    }
+
+    public putSmartInt(value: number): ByteBuffer {
+        if(value >= 128) {
+            this.put(value, 'int');
+        } else {
+            this.put(value, 'short');
+        }
+        return this;
+    }
+
+    public getSmartInt(offset: number, signed: Signedness = 'signed'): number {
+        const peek = this[offset];
+
+        const signedString = ByteBuffer.getSignage(signed);
+
+        if(peek < 128) {
+            return this.get('short', 'u') - (signedString === 'S' ? 0 : 64);
+        } else {
+            return this.get('int', 'u') - (signedString === 'S' ? 32768 : 49152);
         }
     }
 

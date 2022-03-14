@@ -19,7 +19,7 @@ export interface XteaConfig {
 
 
 export interface XteaKeys {
-    gameVersion: number;
+    gameBuild: string;
     key: XteaKey;
 }
 
@@ -46,15 +46,9 @@ export class Xtea {
         const xteaFileNames = fs.readdirSync(xteaConfigPath);
         for(const fileName of xteaFileNames) {
             try {
-                const gameVersionString = fileName.substring(0, fileName.indexOf('.json'));
-                if(!gameVersionString) {
+                const gameBuild = fileName.substring(0, fileName.indexOf('.json'));
+                if(!gameBuild) {
                     logger.error(`Error loading XTEA config file ${fileName}: No game version supplied.`);
-                    continue;
-                }
-
-                const gameVersion: number = Number(gameVersionString);
-                if(!gameVersion || isNaN(gameVersion)) {
-                    logger.error(`Error loading XTEA config file ${fileName}: Invalid game version supplied.`);
                     continue;
                 }
 
@@ -78,7 +72,7 @@ export class Xtea {
                         fileKeys = xteaKeys.get(fileName);
                     }
 
-                    fileKeys.push({ gameVersion, key });
+                    fileKeys.push({ gameBuild, key });
                     xteaKeys.set(fileName, fileKeys);
                 }
             } catch(error) {
