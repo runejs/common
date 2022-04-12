@@ -3,3 +3,5 @@ src
 .idea
 test.js
 test.ts
+dev.js
+dev.ts
