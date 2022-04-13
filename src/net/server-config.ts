@@ -25,15 +25,15 @@ export const defaults: ServerConfigOptions = {
 
 
 export const sanitizeConfigOptions = (options?: ServerConfigOptions): ServerConfigOptions => {
-    if(!options) {
+    if (!options) {
         options = {
             useDefault: false
         };
     }
 
     const keys = Object.keys(defaults);
-    for(const propName of keys) {
-        if(!options[propName]) {
+    for (const propName of keys) {
+        if (!options[propName]) {
             options[propName] = defaults[propName];
         }
     }
@@ -46,18 +46,18 @@ export function parseServerConfig<T>(options?: ServerConfigOptions): T {
     options = sanitizeConfigOptions(options);
 
     let filePath = path.join(options.configDir, options.configFileName);
-    if(options.useDefault) {
+    if (options.useDefault) {
         filePath += '.example';
     }
 
     let fileType: ConfigFileFormat | undefined;
 
-    if(fs.existsSync(`${filePath}.json`)) {
+    if (fs.existsSync(`${filePath}.json`)) {
         fileType = 'json';
-    } else if(fs.existsSync(`${filePath}.yaml`)) {
+    } else if (fs.existsSync(`${filePath}.yaml`)) {
         fileType = 'yaml';
     } else {
-        if(!options.useDefault) {
+        if (!options.useDefault) {
             logger.warn(`Server config not provided, using default...`);
             return parseServerConfig({ useDefault: true });
         } else {
@@ -68,13 +68,13 @@ export function parseServerConfig<T>(options?: ServerConfigOptions): T {
     filePath += `.${fileType}`;
 
     const configFileContent = fs.readFileSync(filePath, 'utf-8');
-    if(!configFileContent) {
+    if (!configFileContent) {
         throw new Error(`Syntax error encountered while loading server configuration file.`);
     }
 
-    if(fileType === 'json') {
+    if (fileType === 'json') {
         options = JSON.parse(configFileContent) as T;
-    } else if(fileType === 'yaml') {
+    } else if (fileType === 'yaml') {
         options = safeLoad(configFileContent, { schema: JSON_SCHEMA }) as T;
     }
 

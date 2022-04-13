@@ -5,9 +5,9 @@ import { fixedFloor, pad } from '../util';
 
 export abstract class HCLValues extends Color<HCLValues> {
 
-    public h: number;
-    public c: number;
-    public l: number;
+    h: number;
+    c: number;
+    l: number;
 
     abstract toString();
 
@@ -22,19 +22,19 @@ export class HCL extends HCLValues {
     /**
      * The RGB equivalent of this color, if provided during instantiation.
      */
-    public rgb: RGB | undefined; // @TODO runtime conversion
+    rgb: RGB | undefined; // @TODO runtime conversion
 
     /**
      * Creates a new Hue-Chroma-Luminance (HCL) color instance from the given ARGB integer value.
      * @param argb The ARGB integer to convert to HCL.
      */
-    public constructor(argb: number);
+    constructor(argb: number);
 
     /**
      * Creates a new Hue-Chroma-Luminance (HCL) color instance from the given RGB(A) color.
      * @param rgb The RGB color to convert to HCL.
      */
-    public constructor(rgb: RGB);
+    constructor(rgb: RGB);
 
     /**
      * Creates a new Hue-Chroma-Luminance (HCL) color instance from the given hue, chroma, and luminance values.
@@ -43,12 +43,12 @@ export class HCL extends HCLValues {
      * @param luminance The color's luminance value.
      * @param alpha [optional] The alpha value of the color, from 0-255. Defaults to 255, fully opaque.
      */
-    public constructor(hue: number, chroma: number, luminance: number, alpha?: number);
+    constructor(hue: number, chroma: number, luminance: number, alpha?: number);
 
-    public constructor(arg0: number | RGB, chroma?: number, luminance?: number, alpha = 255) {
+    constructor(arg0: number | RGB, chroma?: number, luminance?: number, alpha = 255) {
         super('hcl');
         let hue = arg0;
-        if(chroma === undefined && luminance === undefined) {
+        if (chroma === undefined && luminance === undefined) {
             this.rgb = typeof arg0 === 'number' ? new RGB(arg0) : arg0;
             const { h, c, l } = HCL.fromRgb(this.rgb);
             hue = h;
@@ -67,8 +67,8 @@ export class HCL extends HCLValues {
      * Converts the given RGB(A) color into the Hue-Chroma-Luminance (HCL) format.
      * @param rgb The RGB(A) color to convert into HCL.
      */
-    public static fromRgb(rgb: RGB): Partial<HCLValues> {
-        if(rgb.isPureBlack) {
+    static fromRgb(rgb: RGB): Partial<HCLValues> {
+        if (rgb.isPureBlack) {
             return { h: constants.black_hue, c: 0, l: 0 };
         }
 
@@ -82,7 +82,7 @@ export class HCL extends HCLValues {
 
         let c, l: number;
 
-        if(max === 0) {
+        if (max === 0) {
             c = 0;
             l = 0;
         } else {
@@ -106,11 +106,11 @@ export class HCL extends HCLValues {
      * Checks to see if the given color matches this color.
      * @param other The new color to check against the current color.
      */
-    public equals(other: HCL): boolean {
+    equals(other: HCL): boolean {
         return this.h === other.h && this.c === other.c && this.l === other.l;
     }
 
-    public toString(): string {
+    toString(): string {
         return `HCL(A) ( ${pad(this.h, 3)}, ${pad(this.c, 3)}%, ` +
             `${pad(this.l, 3)}%, ${pad(this.alpha, 3)} )`;
     }

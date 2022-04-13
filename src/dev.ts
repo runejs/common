@@ -1,23 +1,29 @@
 import { SocketServer } from './net';
 import { ByteBuffer } from './buffer';
-import { logger } from './index';
+import { logger, prettyPrintTarget, fileTarget } from './logger';
 import { Socket } from 'net';
+
+
+logger.setTargets([
+    prettyPrintTarget(), 
+    fileTarget('./logs/latest.log')
+]);
 
 
 class TestConnectionHandler extends SocketServer {
 
-    public decodeMessage(data: ByteBuffer): void {
+    decodeMessage(data: ByteBuffer): void {
         logger.info(`Data received:`, data.get('string'));
         logger.info(data.get('long').toString());
     }
 
-    public initialHandshake(data: ByteBuffer): boolean {
+    initialHandshake(data: ByteBuffer): boolean {
         logger.info(`Initial handshake:`, data.get('string'));
         logger.info(data.get('long').toString());
         return true;
     }
 
-    public connectionDestroyed(): void {
+    connectionDestroyed(): void {
         logger.info(`Connection destroyed.`);
     }
 

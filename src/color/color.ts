@@ -11,14 +11,14 @@ export const constants = {
 
 export abstract class Color<T> {
 
-    public readonly format: ColorFormat;
-    public alpha: number;
+    readonly format: ColorFormat;
+    alpha: number;
 
-    public constructor(format: ColorFormat, alpha: number = 255) {
-        if(!format) {
+    constructor(format: ColorFormat, alpha: number = 255) {
+        if (!format) {
             throw new Error(`Invalid color format ${format}.`);
         }
-        if(alpha < 0 || alpha > 255) {
+        if (alpha < 0 || alpha > 255) {
             throw new Error(`Alpha value must be between 0-255, received ${alpha}.`);
         }
 
@@ -26,7 +26,7 @@ export abstract class Color<T> {
         this.alpha = alpha;
     }
 
-    public static values<T>(colorValues: Partial<T>): Partial<T> {
+    static values<T>(colorValues: Partial<T>): Partial<T> {
         return { ...colorValues } as unknown as Partial<T>;
     }
 
@@ -35,8 +35,8 @@ export abstract class Color<T> {
      */
     abstract toString(): string;
 
-    public values(colorValues: Partial<T>): T {
-        if(colorValues['alpha']) {
+    values(colorValues: Partial<T>): T {
+        if (colorValues['alpha']) {
             return { ...colorValues, format: this.format } as unknown as T;
         }
         return { ...colorValues, format: this.format, alpha: this.alpha } as unknown as T;

@@ -7,7 +7,7 @@ export enum FileCompression {
 export type CompressionMethod = 'none' | 'bzip' | 'gzip';
 
 export const getCompressionMethod = (compression: FileCompression | number): CompressionMethod => {
-    if(compression === 0 || compression > 2) {
+    if (compression === 0 || compression > 2) {
         return 'none';
     }
 

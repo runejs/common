@@ -6,29 +6,84 @@
 
 Common logging, networking, compression, and other miscellaneous functionality for RuneJS.
 
-## Exported Modules
+## `@runejs/common`
 
-### `@runejs/common`
-* `logger` is exported as a singleton Pino logging wrapper.
-  * Methods:
-      * `logger.info(...messages: any[])`
-      * `logger.debug(...messages: any[])`
-      * `logger.warn(...messages: any[])`
-      * `logger.error(...messages: any[])`
-      * `logger.trace(...messages: any[])`
-      * `logger.fatal(...messages: any[])`
-      * `logger.destination(logDir: string)`
-      * `logger.setOptions(options: Pino.LoggerOptions)`
-      * `logger.setPrettyPrint(prettyPrint: boolean)`
-      * `logger.setTimeFormat(format: TimeFn)`
-* `ByteBuffer` is also exported at the root level.
-  * Node `Uint8Array` wrapper with additional utility functions.
-  * Unified configurable `get` and `put` methods to easily move bytes within the buffer.
-  * Int24, Smart, Long and String type support.
-  * Big endian, little endian, and mixed endian support.
-  * Bit access through `openBitBuffer()`, `putBits()`, and `closeBitBuffer()`
+### `logger`
 
-### `@runejs/common/color`
+_Also exported from `@runejs/common/logger`_
+
+`logger` is exported as a singleton Pino logging wrapper that provides the following methods:
+
+```typescript
+logger.info  = (...messages: any[]): void;
+logger.debug = (...messages: any[]): void;
+logger.warn  = (...messages: any[]): void;
+logger.error = (...messages: any[]): void;
+logger.trace = (...messages: any[]): void;
+logger.fatal = (...messages: any[]): void;
+
+logger.setOptions = (
+  options: Partial<pino.LoggerOptions>, 
+  reInitialize: boolean = true
+): void;
+
+logger.setTargets = (
+  targets: pino.TransportTargetOptions<Record<string, any>>[], 
+  reInitialize: boolean = true
+): void;
+
+logger.setTarget = (
+  target: string, 
+  reInitialize: boolean = true
+): void;
+```
+
+#### Logger Transports & Targets
+
+In addition, several helper functions are exported separately for configuring basic logger transport targets:
+
+```typescript
+defaultTarget = (
+  level: pino.LevelWithSilent = 'info'
+) => pino.TransportTargetOptions<Record<string, any>>
+
+prettyPrintTarget = (
+  level: pino.LevelWithSilent = 'info'
+) => pino.TransportTargetOptions<Record<string, any>>
+
+fileTarget = (
+  destination: string, 
+  level: pino.LevelWithSilent = 'info'
+) => pino.TransportTargetOptions<Record<string, any>>
+```
+
+#### Logger Target Configuration
+
+An example configuration to set log output to pretty print and output to a local log file would look like so:
+
+```typescript
+import { 
+  logger, prettyPrintTarget, fileTarget 
+} from '@runejs/common';
+
+logger.setTargets([
+    prettyPrintTarget(), 
+    fileTarget('./logs/latest.log')
+]);
+```
+
+### `ByteBuffer`
+
+_Also exported from `@runejs/common/buffer`_
+
+`ByteBuffer` is a wrapper class extending  `Uint8Array` with additional utility functions.
+
+* Unified configurable `get` and `put` methods to easily move bytes within the buffer.
+* Supported data types: Bit, Byte, Short, Int24, Smart Short, Int, Smart Int, Long and String.
+* Big endian, little endian, and mixed endian support.
+* Bit access through `openBitBuffer()`, `putBits()`, and `closeBitBuffer()`
+
+## `@runejs/common/color`
 Handles various color conversions needed by the game and tooling.
 * `RGB(A)`
 * `HSL` (Hue, Saturation, Lightness)
@@ -36,18 +91,18 @@ Handles various color conversions needed by the game and tooling.
 * `HCL` (Hue, Chroma, Luminance)
 * `LAB` (Lightness, A, B)
 
-### `@runejs/common/compress`
+## `@runejs/common/compress`
 * Exported class `Gzip` handles Gzip compression and decompression.
 * Exported class `Bzip2` handles Bzip2 compression and decompression.
 
-### `@runejs/common/crc32`
+## `@runejs/common/crc32`
 Exports a single class `Crc32` that generates CRC32 checksums for binary data files.
 
-### `@runejs/common/encrypt`
+## `@runejs/common/encrypt`
 Provides XTEA encryption and decryption functionality, as well as a key file loader.
 * Exported as class `Xtea`
 
-### `@runejs/common/net`
+## `@runejs/common/net`
 * `SocketServer`
   * Handles connections made to a RuneJS socket server.
 * `SocketServer.launch(serverName, hostName, port, connectionHandlerFactory)`

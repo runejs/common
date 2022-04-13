@@ -7,20 +7,20 @@
     "main": "./index.js",
     "types": "./index.d.ts",
     "exports": {
-        ".": "./index.js",
-        "./buffer": "./buffer/index.js",
-        "./color": "./color/index.js",
-        "./compress": "./compress/index.js",
-        "./crc32": "./crc32/index.js",
-        "./encrypt": "./encrypt/index.js",
-        "./fs": "./fs/index.js",
-        "./logger": "./logger/index.js",
-        "./net": "./net/index.js",
-        "./util": "./util/index.js"
+        "./*": "./index.js",
+        "./buffer/*": "./buffer/index.js",
+        "./color/*": "./color/index.js",
+        "./compress/*": "./compress/index.js",
+        "./crc32/*": "./crc32/index.js",
+        "./encrypt/*": "./encrypt/index.js",
+        "./fs/*": "./fs/index.js",
+        "./logger/*": "./logger/index.js",
+        "./net/*": "./net/index.js",
+        "./util/*": "./util/index.js"
     },
     "scripts": {
         "build": "tsc",
-        "start": "ts-node src/dev.ts",
+        "start": "ts-node-dev src/dev.ts",
         "lint": "eslint --ext .ts src",
         "lint:fix": "eslint --ext .ts src --fix",
         "copy-documents": "copyfiles package.json README.md .npmignore LICENSE lib",
@@ -48,15 +48,12 @@
     },
     "dependencies": {
         "compressjs": "^1.0.3",
-        "js-yaml": "^3.14.1",
-        "pino": "^6.14.0",
-        "pino-pretty": "^4.8.0",
-        "sonic-boom": "^2.6.0"
+        "pino": "^7.10.0",
+        "pino-pretty": "^7.6.1"
     },
     "devDependencies": {
-        "@runejs/eslint-config": "^1.1.0",
+        "@runejs/eslint-config": "^2.0.0",
         "@types/node": "^16.11.26",
-        "@types/pino": "^6.3.12",
         "@typescript-eslint/eslint-plugin": "^5.14.0",
         "@typescript-eslint/parser": "^5.14.0",
         "copyfiles": "^2.4.1",
@@ -68,7 +65,7 @@
     },
     "eslintConfig": {
         "extends": [
-            "@runejs/eslint-config"
+            "@runejs"
         ],
         "parserOptions": {
             "project": "./tsconfig.json"

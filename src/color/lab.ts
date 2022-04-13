@@ -5,9 +5,9 @@ import { fixedFloor, pad } from '../util';
 
 export abstract class LABValues extends Color<LABValues> {
 
-    public l: number;
-    public a: number;
-    public b: number;
+    l: number;
+    a: number;
+    b: number;
 
     abstract toString();
 
@@ -22,19 +22,19 @@ export class LAB extends LABValues {
     /**
      * The RGB equivalent of this color, if provided during instantiation.
      */
-    public rgb: RGB | undefined; // @TODO runtime conversion
+    rgb: RGB | undefined; // @TODO runtime conversion
 
     /**
      * Creates a new LAB color instance from the given ARGB integer value.
      * @param argb The ARGB integer to convert to LAB.
      */
-    public constructor(argb: number);
+    constructor(argb: number);
 
     /**
      * Creates a new LAB color instance from the given RGB(A) color.
      * @param rgb The RGB color to convert to LAB.
      */
-    public constructor(rgb: RGB);
+    constructor(rgb: RGB);
 
     /**
      * Creates a new LAB color instance from the given lightness, a, and b values.
@@ -43,12 +43,12 @@ export class LAB extends LABValues {
      * @param b The color's B value.
      * @param alpha [optional] The alpha value of the color, from 0-255. Defaults to 255, fully opaque.
      */
-    public constructor(lightness: number, a: number, b: number, alpha?: number);
+    constructor(lightness: number, a: number, b: number, alpha?: number);
 
-    public constructor(arg0: number | RGB, a?: number, b?: number, alpha = 255) {
+    constructor(arg0: number | RGB, a?: number, b?: number, alpha = 255) {
         super('hcl');
         let lightness = arg0;
-        if(a === undefined && b === undefined) {
+        if (a === undefined && b === undefined) {
             this.rgb = typeof arg0 === 'number' ? new RGB(arg0) : arg0;
             const { l, a: a2, b: b2 } = LAB.fromRgb(this.rgb);
             lightness = l;
@@ -67,8 +67,8 @@ export class LAB extends LABValues {
      * Converts the given RGB(A) color into the LAB format.
      * @param rgb The RGB(A) color to convert into LAB.
      */
-    public static fromRgb(rgb: RGB): Partial<LABValues> {
-        if(rgb.isPureBlack) {
+    static fromRgb(rgb: RGB): Partial<LABValues> {
+        if (rgb.isPureBlack) {
             return { l: 0, a: 0, b: 0 };
         }
 
@@ -97,7 +97,7 @@ export class LAB extends LABValues {
      * Checks to see if the given color matches this color.
      * @param other The new color to check against the current color.
      */
-    public equals(other: LAB): boolean {
+    equals(other: LAB): boolean {
         return this.l === other.l && this.a === other.a && this.b === other.b;
     }
 
@@ -105,7 +105,7 @@ export class LAB extends LABValues {
      * Calculates the difference between two colors.
      * @param other The new color to check against the current color.
      */
-    public difference(other: LAB): number {
+    difference(other: LAB): number {
         const deltaL = this.l - other.l;
         const deltaA = this.a - other.a;
         const deltaB = this.b - other.b;
@@ -123,7 +123,7 @@ export class LAB extends LABValues {
         return i < 0 ? 0 : Math.sqrt(i);
     }
 
-    public toString(): string {
+    toString(): string {
         return `LAB(A) ( ${pad(this.l, 3)}%, ${pad(this.a, 3)}, ` +
             `${pad(this.b, 3)}, ${pad(this.alpha, 3)} )`;
     }

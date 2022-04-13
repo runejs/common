@@ -7,12 +7,12 @@ import { setObjectProps } from '../util';
 
 export class SocketServerOptions {
 
-    public handshakeRequired: boolean = true;
-    public noDelay: boolean = true;
-    public keepAlive: boolean = true;
-    public timeout: number = 30000;
+    handshakeRequired: boolean = true;
+    noDelay: boolean = true;
+    keepAlive: boolean = true;
+    timeout: number = 30000;
 
-    public constructor(props?: Partial<SocketServerOptions>) {
+    constructor(props?: Partial<SocketServerOptions>) {
         setObjectProps<SocketServerOptions>(this, props);
     }
 
@@ -21,16 +21,16 @@ export class SocketServerOptions {
 
 export abstract class SocketServer<T = undefined> {
 
-    public readonly socket: Socket;
-    public readonly options: SocketServerOptions;
+    readonly socket: Socket;
+    readonly options: SocketServerOptions;
 
     protected _connectionStatus: ConnectionStatus | T = ConnectionStatus.HANDSHAKE;
 
-    public constructor(socket: Socket);
-    public constructor(socket: Socket, options: Partial<SocketServerOptions>);
-    public constructor(socket: Socket, options: SocketServerOptions);
-    public constructor(socket: Socket, options: Partial<SocketServerOptions> | SocketServerOptions | undefined);
-    public constructor(socket: Socket, options?: Partial<SocketServerOptions> | SocketServerOptions | undefined) {
+    constructor(socket: Socket);
+    constructor(socket: Socket, options: Partial<SocketServerOptions>);
+    constructor(socket: Socket, options: SocketServerOptions);
+    constructor(socket: Socket, options: Partial<SocketServerOptions> | SocketServerOptions | undefined);
+    constructor(socket: Socket, options?: Partial<SocketServerOptions> | SocketServerOptions | undefined) {
         this.socket = socket;
         this.options = new SocketServerOptions(options);
 
@@ -38,20 +38,20 @@ export abstract class SocketServer<T = undefined> {
         socket.setKeepAlive(this.options.keepAlive);
         socket.setTimeout(this.options.timeout);
 
-        if(!this.options.handshakeRequired) {
+        if (!this.options.handshakeRequired) {
             this._connectionStatus = ConnectionStatus.ACTIVE;
         }
 
         socket.on('data', data => {
             try {
                 this.dataReceived(data);
-            } catch(e) {
+            } catch (e) {
                 this.error(e);
             }
         });
 
         socket.on('close', hadError => {
-            if(hadError) {
+            if (hadError) {
                 this.error(new Error('Socket closed unexpectedly!'));
             } else {
                 this.closeConnection();
@@ -61,7 +61,7 @@ export abstract class SocketServer<T = undefined> {
         socket.on('error', error => this.error(error));
     }
 
-    public static launch<T extends SocketServer<any>>(
+    static launch<T extends SocketServer<any>>(
         serverName: string,
         hostName: string,
         port: number,
@@ -79,15 +79,15 @@ export abstract class SocketServer<T = undefined> {
     abstract decodeMessage(data: ByteBuffer): void | Promise<void>;
     abstract connectionDestroyed(): void;
 
-    public dataReceived(data: Buffer): void {
-        if(!data) {
+    dataReceived(data: Buffer): void {
+        if (!data) {
             return;
         }
 
         const byteBuffer = ByteBuffer.fromNodeBuffer(data);
 
-        if(this.options.handshakeRequired && this.connectionStatus === ConnectionStatus.HANDSHAKE) {
-            if(this.initialHandshake(byteBuffer)) {
+        if (this.options.handshakeRequired && this.connectionStatus === ConnectionStatus.HANDSHAKE) {
+            if (this.initialHandshake(byteBuffer)) {
                 this._connectionStatus = ConnectionStatus.ACTIVE;
             } else {
                 logger.warn(`Initial client handshake failed.`);
@@ -97,21 +97,21 @@ export abstract class SocketServer<T = undefined> {
         }
     }
 
-    public closeConnection(): void {
+    closeConnection(): void {
         this._connectionStatus = ConnectionStatus.CLOSED;
-        if(this.socket?.writable && !this.socket.destroyed) {
+        if (this.socket?.writable && !this.socket.destroyed) {
             this.socket.destroy();
         }
 
         this.connectionDestroyed();
     }
 
-    public error(error: Error): void;
-    public error(error: { message?: string }): void;
-    public error(error: string): void;
-    public error(error: any | Error | { message?: string } | string): void;
-    public error(error: any | Error | { message?: string } | string): void {
-        if(error && typeof error === 'string') {
+    error(error: Error): void;
+    error(error: { message?: string }): void;
+    error(error: string): void;
+    error(error: any | Error | { message?: string } | string): void;
+    error(error: any | Error | { message?: string } | string): void {
+        if (error && typeof error === 'string') {
             error = { message: error };
         }
 
@@ -119,17 +119,17 @@ export abstract class SocketServer<T = undefined> {
 
         try {
             this.closeConnection();
-        } catch(closeConnectionError) {
+        } catch (closeConnectionError) {
             logger.error('Error closing server connection' +
             closeConnectionError?.message ? `: ${closeConnectionError.message}` : '.');
         }
     }
 
-    public get connectionStatus(): ConnectionStatus | T {
+    get connectionStatus(): ConnectionStatus | T {
         return this._connectionStatus;
     }
 
-    public get connectionAlive(): boolean {
+    get connectionAlive(): boolean {
         return this.socket?.writable && !this.socket.destroyed;
     }
 
