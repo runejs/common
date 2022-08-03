@@ -1,7 +1,8 @@
-import { SocketServer } from './net';
+import { SocketServer, ConnectionHandler } from './net';
 import { ByteBuffer } from './buffer';
 import { logger, prettyPrintTarget, fileTarget } from './logger';
 import { Socket } from 'net';
+import { RGB } from './color';
 
 
 logger.setTargets([
@@ -10,7 +11,7 @@ logger.setTargets([
 ]);
 
 
-class TestConnectionHandler extends SocketServer {
+class TestConnectionHandler extends ConnectionHandler {
 
     decodeMessage(data: ByteBuffer): void {
         logger.info(`Data received:`, data.get('string'));
@@ -29,17 +30,20 @@ class TestConnectionHandler extends SocketServer {
 
 }
 
+
 function launchTestServer() {
     logger.info('Starting server...');
 
     const TEST_PORT = 8000;
 
-    const server = SocketServer.launch('Test Server', '0.0.0.0', TEST_PORT, socket =>
-        new TestConnectionHandler(socket, {
-            timeout: 300,
-            keepAlive: false,
-            handshakeRequired: false
-        }));
+    const server = new SocketServer({
+        timeout: 300,
+        keepAlive: false,
+        handshakeRequired: false
+    });
+
+    server.start('Test Server', '0.0.0.0', TEST_PORT, socket =>
+        new TestConnectionHandler(server, socket));
 
     const speakySocket = new Socket();
     speakySocket.connect(TEST_PORT);
@@ -59,7 +63,10 @@ function launchTestServer() {
     }, 2000);
 
     setTimeout(() => speakySocket.destroy(), 3000);
-    setTimeout(() => server.close(), 4000);
+    setTimeout(() => server.stop(), 4000);
 }
 
-launchTestServer();
+// launchTestServer();
+
+const whatTheFuckIsThisColor = new RGB(16711935);
+console.log(whatTheFuckIsThisColor);

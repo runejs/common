@@ -105,7 +105,7 @@ Provides XTEA encryption and decryption functionality, as well as a key file loa
 ## `@runejs/common/net`
 * `SocketServer`
   * Handles connections made to a RuneJS socket server.
-* `SocketServer.launch(serverName, hostName, port, connectionHandlerFactory)`
-  * Spins up a new Node Socket server with the specified host and port.
-* `ServerConfigOptions`
-  * Options for a configured Socket server, imported using the `parseServerConfig()` function.
+* `SocketServer.start(serverName, hostName, port, connectionHandlerFactory)`
+  * Initializes the socket server using the specified host and port.
+* `SocketServer.stop()`
+  * Gracefully shuts down the socket server instance.

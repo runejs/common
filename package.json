@@ -1,34 +1,69 @@
 {
     "name": "@runejs/common",
-    "version": "2.1.0-beta.1",
+    "version": "3.0.0-beta.3",
     "description": "Common logging, networking, compression, and other miscellaneous functionality for RuneJS.",
     "author": "Kikorono",
     "license": "GPL-3.0",
-    "main": "./index.js",
-    "types": "./index.d.ts",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
     "exports": {
-        "./*": "./index.js",
-        "./buffer/*": "./buffer/index.js",
-        "./color/*": "./color/index.js",
-        "./compress/*": "./compress/index.js",
-        "./crc32/*": "./crc32/index.js",
-        "./encrypt/*": "./encrypt/index.js",
-        "./fs/*": "./fs/index.js",
-        "./logger/*": "./logger/index.js",
-        "./net/*": "./net/index.js",
-        "./util/*": "./util/index.js"
+        ".": "./lib/index.js",
+        "./buffer": "./lib/buffer/index.js",
+        "./color": "./lib/color/index.js",
+        "./compress": "./lib/compress/index.js",
+        "./crc32": "./lib/crc32/index.js",
+        "./encrypt": "./lib/encrypt/index.js",
+        "./env": "./lib/env/index.js",
+        "./fs": "./lib/fs/index.js",
+        "./logger": "./lib/logger/index.js",
+        "./net": "./lib/net/index.js",
+        "./util": "./lib/util/index.js",
+        "./package.json": "./package.json"
+    },
+    "typesVersions": {
+        "*": {
+            "buffer": [
+                "./lib/buffer/index.d.ts"
+            ],
+            "color": [
+                "./lib/color/index.d.ts"
+            ],
+            "compress": [
+                "./lib/compress/index.d.ts"
+            ],
+            "crc32": [
+                "./lib/crc32/index.d.ts"
+            ],
+            "encrypt": [
+                "./lib/encrypt/index.d.ts"
+            ],
+            "env": [
+                "./lib/env/index.d.ts"
+            ],
+            "fs": [
+                "./lib/fs/index.d.ts"
+            ],
+            "logger": [
+                "./lib/logger/index.d.ts"
+            ],
+            "net": [
+                "./lib/net/index.d.ts"
+            ],
+            "util": [
+                "./lib/util/index.d.ts"
+            ]
+        }
     },
     "scripts": {
         "build": "tsc",
         "start": "ts-node-dev src/dev.ts",
         "lint": "eslint --ext .ts src",
         "lint:fix": "eslint --ext .ts src --fix",
-        "copy-documents": "copyfiles package.json README.md .npmignore LICENSE lib",
-        "package": "rimraf lib && npm i && npm run build && npm run copy-documents && cd lib && npm publish --dry-run",
-        "publish:next": "npm run package && cd lib && npm publish -tag next",
-        "publish:beta": "npm run package && cd lib && npm publish -tag beta",
-        "publish:rc": "npm run package && cd lib && npm publish -tag rc",
-        "publish:release": "npm run package && cd lib && npm publish"
+        "package": "rimraf lib && npm i && npm run build && npm publish --dry-run",
+        "publish:next": "npm run package && npm publish -tag next",
+        "publish:beta": "npm run package && npm publish -tag beta",
+        "publish:rc": "npm run package && npm publish -tag rc",
+        "publish:release": "npm run package && npm publish"
     },
     "repository": {
         "type": "git",
@@ -47,9 +82,13 @@
         "tslib": ">=2.3.0"
     },
     "dependencies": {
+        "buffer": "^6.0.3",
         "compressjs": "^1.0.3",
+        "dotenv": "^16.0.0",
+        "path": "^0.12.7",
         "pino": "^7.10.0",
-        "pino-pretty": "^7.6.1"
+        "pino-pretty": "^7.6.1",
+        "zlib": "^1.0.5"
     },
     "devDependencies": {
         "@runejs/eslint-config": "^2.0.0",

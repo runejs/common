@@ -200,6 +200,10 @@ export class ByteBuffer extends Uint8Array {
         this.readerIndex += length;
     }
 
+    putBit(value: number): ByteBuffer {
+        return this.putBits(1, value);
+    }
+
     putBits(bitCount: number, value: number): ByteBuffer {
         let byteIndex: number = this.bitIndex >> 3;
         let bitOffset: number = 8 - (this.bitIndex & 7);
@@ -212,7 +216,7 @@ export class ByteBuffer extends Uint8Array {
             bitCount -= bitOffset;
         }
 
-        if (bitCount == bitOffset) {
+        if (bitCount === bitOffset) {
             this[byteIndex] &= ~BIT_MASKS[bitOffset];
             this[byteIndex] |= value & BIT_MASKS[bitOffset];
         } else {
@@ -221,6 +225,29 @@ export class ByteBuffer extends Uint8Array {
         }
 
         return this;
+    }
+
+    getBit(): number {
+        return this.getBits(1);
+    }
+
+    getBits(bitCount: number): number {
+        let k = this._bitIndex >> 3;
+        let l = 8 - (this._bitIndex & 7);
+        let val = 0;
+        this._bitIndex += bitCount;
+        for (; bitCount > l; l = 8) {
+            val += (this.buffer[k++] & BIT_MASKS[l]) << bitCount - l;
+            bitCount -= l;
+        }
+
+        if (bitCount == l) {
+            val += this.buffer[k] & BIT_MASKS[l];
+        } else {
+            val += this.buffer[k] >> l - bitCount & BIT_MASKS[bitCount];
+        }
+
+        return val;
     }
 
     openBitBuffer(): ByteBuffer {
@@ -242,6 +269,14 @@ export class ByteBuffer extends Uint8Array {
         const newBuffer = new ByteBuffer(this.readerIndex);
         this.copy(newBuffer, 0, 0, this.readerIndex);
         return newBuffer;
+    }
+
+    flushWriter(): ByteBuffer {
+        return this.flipWriter();
+    }
+
+    flushReader(): ByteBuffer {
+        return this.flipReader();
     }
 
     getString(terminatingChar: number = 0): string {
