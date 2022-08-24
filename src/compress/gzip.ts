@@ -1,15 +1,16 @@
 import { gunzipSync, gzipSync } from 'zlib';
 import { ByteBuffer } from '../buffer';
+import { Buffer } from 'buffer';
 
 
 export class Gzip {
 
-    static compress(buffer: ByteBuffer): ByteBuffer {
-        return new ByteBuffer(gzipSync(buffer));
+    static compress(buffer: ByteBuffer | Buffer): Buffer {
+        return gzipSync(buffer);
     }
 
-    static decompress(buffer: ByteBuffer): ByteBuffer {
-        return new ByteBuffer(gunzipSync(buffer));
+    static decompress(buffer: ByteBuffer | Buffer): Buffer {
+        return gunzipSync(buffer);
     }
 
 }
