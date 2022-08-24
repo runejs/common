@@ -66,7 +66,7 @@ function launchTestServer() {
     setTimeout(() => server.stop(), 4000);
 }
 
-// launchTestServer();
+launchTestServer();
 
-const whatTheFuckIsThisColor = new RGB(16711935);
-console.log(whatTheFuckIsThisColor);
+const whatisthiscolor = new RGB(16711935);
+console.log(whatisthiscolor);

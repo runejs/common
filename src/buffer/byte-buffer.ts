@@ -2,8 +2,8 @@ import { Buffer } from 'buffer';
 import { logger } from '../logger';
 
 export type DataType =
-    'BYTE' | 'SHORT' | 'SMART_SHORT' | 'SMART_INT' | 'INT24' | 'INT' | 'LONG' | 'STRING' |
-    'byte' | 'short' | 'smart_short' | 'smart_int' | 'int24' | 'int' | 'long' | 'string';
+    'BYTE' | 'SHORT' | 'SMART_SHORT' | 'SMART_INT' | 'INT24' | 'MEDIUM' | 'INT' | 'LONG' | 'STRING' |
+    'byte' | 'short' | 'smart_short' | 'smart_int' | 'int24' | 'medium' | 'int' | 'long' | 'string';
 
 export type Endianness =
     'LITTLE_ENDIAN' | 'BIG_ENDIAN' | 'MIDDLE_ENDIAN_1' | 'MIDDLE_ENDIAN_2' |
@@ -68,7 +68,12 @@ export class ByteBuffer extends Uint8Array {
     private _bitIndex: number;
 
     static getType(type: DataType = 'byte'): DataType {
-        return type.toLowerCase() as DataType;
+        let result = type.toLowerCase() as DataType;
+        if (result === 'medium') {
+            result = 'int24';
+        }
+
+        return result;
     }
 
     static getSignage(signed: Signedness): Signedness {
@@ -279,6 +284,138 @@ export class ByteBuffer extends Uint8Array {
         return this.flipReader();
     }
 
+    getByte(): number {
+        return this.get('byte');
+    }
+
+    getUByte(): number {
+        return this.get('byte', 'unsigned');
+    }
+
+    putByte(value: number): ByteBuffer {
+        return this.put(value, 'byte');
+    }
+
+    getShortBE(): number {
+        return this.get('short', 'signed', 'big_endian');
+    }
+
+    getUShortBE(): number {
+        return this.get('short', 'unsigned', 'big_endian');
+    }
+
+    putShortBE(value: number): ByteBuffer {
+        return this.put(value, 'short', 'big_endian');
+    }
+
+    getShortLE(): number {
+        return this.get('short', 'signed', 'little_endian');
+    }
+
+    getUShortLE(): number {
+        return this.get('short', 'unsigned', 'little_endian');
+    }
+
+    putShortLE(value: number): ByteBuffer {
+        return this.put(value, 'short', 'little_endian');
+    }
+
+    getMediumBE(): number {
+        return this.get('medium', 'signed', 'big_endian');
+    }
+
+    getUMediumBE(): number {
+        return this.get('medium', 'unsigned', 'big_endian');
+    }
+
+    putMediumBE(value: number): ByteBuffer {
+        return this.put(value, 'medium', 'big_endian');
+    }
+
+    getMediumLE(): number {
+        return this.get('medium', 'signed', 'little_endian');
+    }
+
+    getUMediumLE(): number {
+        return this.get('medium', 'unsigned', 'little_endian');
+    }
+
+    putMediumLE(value: number): ByteBuffer {
+        return this.put(value, 'medium', 'little_endian');
+    }
+
+    getIntBE(): number {
+        return this.get('int', 'signed', 'big_endian');
+    }
+
+    getUIntBE(): number {
+        return this.get('int', 'unsigned', 'big_endian');
+    }
+
+    putIntBE(value: number): ByteBuffer {
+        return this.put(value, 'int', 'big_endian');
+    }
+
+    getIntLE(): number {
+        return this.get('int', 'signed', 'little_endian');
+    }
+
+    getUIntLE(): number {
+        return this.get('int', 'unsigned', 'little_endian');
+    }
+
+    putIntLE(value: number): ByteBuffer {
+        return this.put(value, 'int', 'little_endian');
+    }
+
+    getIntME1(): number {
+        return this.get('int', 'signed', 'middle_endian_1');
+    }
+
+    getUIntME1(): number {
+        return this.get('int', 'unsigned', 'middle_endian_1');
+    }
+
+    putIntME1(value: number): ByteBuffer {
+        return this.put(value, 'int', 'middle_endian_1');
+    }
+
+    getIntME2(): number {
+        return this.get('int', 'signed', 'middle_endian_2');
+    }
+
+    getUIntME2(): number {
+        return this.get('int', 'unsigned', 'middle_endian_2');
+    }
+
+    putIntME2(value: number): ByteBuffer {
+        return this.put(value, 'int', 'middle_endian_2');
+    }
+
+    getLongBE(): bigint {
+        return this.get('long', 'signed', 'big_endian');
+    }
+
+    getULongBE(): bigint {
+        return this.get('long', 'unsigned', 'big_endian');
+    }
+
+    putLongBE(value: bigint): ByteBuffer {
+        return this.put(value, 'long', 'big_endian');
+    }
+
+    getLongLE(): bigint {
+        return this.get('long', 'signed', 'little_endian');
+    }
+
+    getULongLE(): bigint {
+        return this.get('long', 'unsigned', 'little_endian');
+    }
+
+    putLongLE(value: bigint): ByteBuffer {
+        return this.put(value, 'long', 'little_endian');
+    }
+
     getString(terminatingChar: number = 0): string {
         const bytes: number[] = [];
         let b: number;
@@ -290,7 +427,7 @@ export class ByteBuffer extends Uint8Array {
         return Buffer.from(bytes).toString();
     }
 
-    putString(value: string): ByteBuffer {
+    putString(value: string, terminatingChar: number = 0): ByteBuffer {
         const encoder = new TextEncoder();
         const bytes = encoder.encode(value);
 
@@ -298,7 +435,7 @@ export class ByteBuffer extends Uint8Array {
             this.put(byte);
         }
 
-        this.put(0); // end of line
+        this.put(terminatingChar); // end of line
         return this;
     }
 
@@ -367,6 +504,22 @@ export class ByteBuffer extends Uint8Array {
         return ((this[offset + 2]) << 16) + ((this[offset + 1]) << 8) + (this[offset]);
     }
 
+    readUIntME1(offset: number): number {
+        return ((this[offset] & 0xff) << 16) + ((this[offset + 1] & 0xff) << 24) + (this[offset + 2] & 0xff) + ((this[offset + 3] & 0xff) << 8);
+    }
+
+    readIntME1(offset: number): number {
+        return ((this[offset]) << 16) + ((this[offset + 1]) << 24) + (this[offset + 2]) + ((this[offset + 3]) << 8);
+    }
+
+    readUIntME2(offset: number): number {
+        return ((this[offset] & 0xff) << 8) + (this[offset + 1] & 0xff) + ((this[offset + 2] & 0xff) << 24) + ((this[offset + 3] & 0xff) << 16);
+    }
+
+    readIntME2(offset: number): number {
+        return ((this[offset]) << 8) + (this[offset + 1]) + ((this[offset + 2]) << 24) + ((this[offset + 3]) << 16);
+    }
+
     writeUInt24BE(value: number, offset: number): void {
         this[offset] = ((value & 0xff) >> 16);
         this[offset + 1] = ((value & 0xff) >> 8);
@@ -389,6 +542,20 @@ export class ByteBuffer extends Uint8Array {
         this[offset + 2] = (value >> 16);
         this[offset + 1] = (value >> 8);
         this[offset] = (value);
+    }
+
+    writeIntME1(value: number, offset: number): void {
+        this[offset] = (value >> 16);
+        this[offset + 1] = (value >> 24);
+        this[offset + 2] = value;
+        this[offset + 3] = (value >> 8);
+    }
+
+    writeIntME2(value: number, offset: number): void {
+        this[offset] = (value >> 8);
+        this[offset + 1] = value;
+        this[offset + 2] = (value >> 24);
+        this[offset + 3] = (value >> 16);
     }
 
     get writerIndex(): number {

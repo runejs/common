@@ -1,5 +1,5 @@
 import { ByteBuffer } from '../buffer';
-import * as compressjs from 'compressjs';
+import * as compressjs from '@ledgerhq/compressjs';
 const bzip = compressjs.Bzip2;
 
 
