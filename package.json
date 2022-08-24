@@ -1,6 +1,6 @@
 {
     "name": "@runejs/common",
-    "version": "3.0.0-beta.5",
+    "version": "3.0.0-beta.7",
     "description": "Common logging, networking, compression, and other miscellaneous functionality for RuneJS.",
     "author": "Kikorono",
     "license": "GPL-3.0",
@@ -86,8 +86,8 @@
         "buffer": "^6.0.3",
         "dotenv": "^16.0.0",
         "path": "^0.12.7",
-        "pino": "^7.10.0",
-        "pino-pretty": "^7.6.1",
+        "pino": "^6.14.0",
+        "pino-pretty": "^6.0.0",
         "zlib": "^1.0.5"
     },
     "devDependencies": {

@@ -40,25 +40,6 @@ export class RuneLogger {
         }
     }
 
-    setTargets(targets: pino.TransportTargetOptions<Record<string, any>>[], 
-        reInitialize: boolean = true): void {
-        this.setOptions({
-            ...this._options,
-            transport: {
-                targets
-            }
-        }, reInitialize);
-    }
-
-    setTarget(target: string, reInitialize: boolean = true): void {
-        this.setOptions({
-            ...this._options,
-            transport: {
-                target
-            }
-        }, reInitialize);
-    }
-
     /**
      * Log at `'log'` level the given messages.
      * @param messages The log messages to write.
@@ -120,7 +101,10 @@ export class RuneLogger {
     }
 
     private pinoInit(): void {
-        this.pinoLogger = pino(this._options);
+        this.pinoLogger = pino({
+            prettyPrint: true,
+            ...this._options
+        });
     }
 
     get options(): pino.LoggerOptions {

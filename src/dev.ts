@@ -1,14 +1,8 @@
 import { SocketServer, ConnectionHandler } from './net';
 import { ByteBuffer } from './buffer';
-import { logger, prettyPrintTarget, fileTarget } from './logger';
+import { logger } from './logger';
 import { Socket } from 'net';
 import { RGB } from './color';
-
-
-logger.setTargets([
-    prettyPrintTarget(), 
-    fileTarget('./logs/latest.log')
-]);
 
 
 class TestConnectionHandler extends ConnectionHandler {
